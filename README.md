@@ -4,10 +4,10 @@ rabbitmq-zabbix
 Template and checks to monitor rabbitmq queues and server via Zabbix.
 
 ## WHY:
-	Because the SNMP plugin isn't an officially supported plugin, and rabbitmqctl based monitors are REALLY slow in comparison.
+Because the SNMP plugin isn't an officially supported plugin, and rabbitmqctl based monitors are REALLY slow in comparison.
 
 ## WHAT:
-	Set of python scripts, zabbix template, and associated data to do autodiscovery
+Set of python scripts, zabbix template, and associated data to do autodiscovery
 
 ## HOW:
 	1. Install the files into /etc/zabbix/ folder, change permissions to Zabbix.
