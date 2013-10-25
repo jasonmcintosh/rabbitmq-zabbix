@@ -1,5 +1,6 @@
 #!/usr/bin/env /usr/bin/python
 import check_rabbit_aliveness
+import urllib
 from base_rabbit_check import BaseRabbitCheck, make_option
 
 
@@ -16,13 +17,7 @@ class RabbitAlivenessCheck(BaseRabbitCheck):
 		"""
 		forms self.url, a correct url to polling a rabbit queue
 		"""
-		try:
-			self.url = "http://%s:%s/api/aliveness-test/%s" % (self.options.hostname, self.options.port, self.options.vhost)
-			return True
-		except Exception, e:
-			self.rabbit_error = 3
-			self.rabbit_note = "problem forming api url:", e
-		return False
+		self.url = "http://%s:%s/api/aliveness-test/%s" % (self.options.hostname, self.options.port, urllib.quote(self.options.vhost,''))
 
 	def testOptions(self):
 		"""
