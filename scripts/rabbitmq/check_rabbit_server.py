@@ -9,7 +9,7 @@ class RabbitCheckServer(BaseRabbitCheck):
 	performs a nagios compliant check on a single queue and
 	attempts to catch all errors. expected usage is with a critical threshold of 0
 	"""
-	serverOptions=["mem_used","mem_limit","disk_free_limit","disk_free","fd_used","fd_total","proc_used","proc_total","sockets_used","sockets_total"]
+	serverOptions=["mem_used","mem_limit","disk_free_limit","disk_free","fd_used","fd_total","proc_used","proc_total","sockets_used","sockets_total", "version"]
 	type = make_option("--type", dest="type", help="Type of check - "+str(serverOptions), type="string", default='%2F')
 	def makeUrl(self):
 		"""
@@ -23,10 +23,16 @@ class RabbitCheckServer(BaseRabbitCheck):
 		if not (self.options.type in self.serverOptions):
 			raise Exception("Type of " + self.options.type + " is incorrect")
 	def parseResult(self, data):
+		nodeData = {};
 		for result in data:
 			if string.split(result['name'], '@')[1] in self.options.hostname:
 				nodeData = result
 		if nodeData:
+			if self.options.type == "version":
+				for appVersion in nodeData["applications"]:
+					if appVersion["name"] == "rabbit":
+						return appVersion["version"]
+				return "UNKNOWN"
 			return nodeData[self.options.type]
 		return ''
 
