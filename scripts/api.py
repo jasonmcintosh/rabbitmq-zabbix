@@ -1,6 +1,6 @@
+#!/usr/bin/env /usr/bin/python
 '''Python module to query the RabbitMQ Management Plugin REST API and get
 results that can then be used by Zabbix.'''
-#!/usr/bin/env /usr/bin/python
 import json
 import optparse
 import socket
@@ -19,9 +19,9 @@ class RabbitMQAPI(object):
         self.port = port
         self.vhost = vhost
 
-    def call_api(self, url_tag):
+    def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
-        url = 'http://{}:{}/api/{}'.format(self.host_name, self.port, url_tag)
+        url = 'http://{0}:{1}/api/{2}'.format(self.host_name, self.port, path)
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, self.user_name, self.password)
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
@@ -35,8 +35,8 @@ class RabbitMQAPI(object):
         filter down the queue to only those that are desired.
         '''
         queues = []
-        url_tag = 'queues/{}'.format(self.vhost) if self.vhost else 'queues'
-        for queue in self.call_api(url_tag):
+        path = 'queues/{0}'.format(self.vhost) if self.vhost else 'queues'
+        for queue in self.call_api(path):
             element = {'{#VHOSTNAME}': queue['vhost'],
                        '{#QUEUENAME}': queue['name']}
             if filters:
@@ -55,7 +55,7 @@ class RabbitMQAPI(object):
     def check_queue(self, queue, item):
         '''Return the value for a specific item in a queue's details.'''
         vhost = self.vhost if self.vhost else '%2F'
-        data = self.call_api('queues/{}/{}'.format(vhost, queue))
+        data = self.call_api('queues/{0}/{1}'.format(vhost, queue))
         if item == 'idle_since':
             struct_time = time.strptime(data[item], '%Y-%m-%m %H:%M:%S')
             return int(time.mktime(struct_time))
@@ -65,13 +65,13 @@ class RabbitMQAPI(object):
     def check_aliveness(self):
         '''Check the aliveness status of a given vhost.'''
         vhost = self.vhost if self.vhost else '%2F'
-        return self.call_api('aliveness-test/{}'.format(vhost))['status']
+        return self.call_api('aliveness-test/{0}'.format(vhost))['status']
 
     def check_server(self, item, node_name=None):
         '''Return the value for a specific item in a node's details.'''
         if not node_name:
-            node_name = 'rabbit@{}'.format(self.host_name)
-        return self.call_api('nodes/{}'.format(node_name)).get(item)
+            node_name = 'rabbit@{0}'.format(self.host_name)
+        return self.call_api('nodes/{0}'.format(node_name)).get(item)
 
 
 def main():
@@ -90,6 +90,11 @@ def main():
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
                       vhost=options.vhost)
+    if not args:
+        message = 'A command must be provided. Available commands: '
+        message += 'list_queues, list_nodes, check_queue, check_aliveness, or '
+        message += 'check_server'
+        parser.error(message)
     if args[0] == 'list_queues':
         if len(args) == 2:
             try:
