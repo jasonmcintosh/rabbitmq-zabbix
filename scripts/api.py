@@ -96,7 +96,7 @@ def main():
         message += 'check_server'
         parser.error(message)
     if args[0] == 'list_queues':
-        if len(args) == 2:
+        if len(args) == 2 and args[1]:
             try:
                 filters = json.loads(args[1])
             except KeyError:
