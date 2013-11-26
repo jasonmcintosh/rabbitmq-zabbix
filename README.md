@@ -12,7 +12,7 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 ## HOW:
 1. Install the files into /etc/zabbix/ folder, change permissions to Zabbix.
 2. Update the .rab.auth file in scripts/ to use your monitoring username/password (defaulted to guest/guest)
-2a. Optionally add a filter. This allows you to restrict the queue list by any parameter in the queue details. It is a JSON-encoded string. Example: FILTER={"durable": true}
+2a. Optionally add a filter. This allows you to restrict the queue list by any parameter in the queue details. It is a JSON-encoded string. Example: FILTER='{"durable": true}'
 3. Import the template to your zabbix server
 4. Restart the local zabbix agent
 
