@@ -11,10 +11,19 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 
 ## HOW:
 1. Install the files into /etc/zabbix/ folder, change permissions to Zabbix.
-2. Update the .rab.auth file in scripts/ to use your monitoring username/password (defaulted to guest/guest)
+2. Create the .rab.auth file in scripts/ to use your monitoring username/password (defaulted to guest/guest).  Format should be username=guest and on a different line, password=guest
 2a. Optionally add a filter. This allows you to restrict the queue list by any parameter in the queue details. It is a JSON-encoded string. Example: FILTER='{"durable": true}'
 3. Import the template to your zabbix server
-4. Restart the local zabbix agent
+4. Make sure zabbix_sender is installed
+5. Restart the local zabbix agent
+
+## CHANGES
+Updated to use zabbix_sender to push data on request to an item request.  This is similar to how the FromDual MySQL Zabbix stuff works and the concept was pulled from their templates.  
+
+## Ideas for the future?
+Add a local cache of the results (may be overkill for RabbitMQ).
+Feel free to submit changes or ideas - mcintoshj@gmail.com
+
 
 ## Definite kudo's to some of the other developers around the web.  In particularly,
 * Ptyhon Scripts: https://github.com/kmcminn/rabbit-nagios
