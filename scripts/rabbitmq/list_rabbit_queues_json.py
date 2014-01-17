@@ -1,14 +1,14 @@
 #!/usr/bin/env /usr/bin/python
 import list_rabbit_queues_json
 from base_rabbit_check import BaseRabbitCheck, make_option
-import json
+import json, socket
 
 class RabbitQueueList(BaseRabbitCheck):
 	"""
 	performs a nagios compliant check on a single queue and
 	attempts to catch all errors. expected usage is with a critical threshold of 0
 	"""
-
+	fqdn = socket.getfqdn()
 	def makeUrl(self):
 		"""
 		forms self.url, a correct url to polling a rabbit queue
@@ -22,7 +22,7 @@ class RabbitQueueList(BaseRabbitCheck):
 	def parseResult(self, data):
 		queues = []
 		for queueData in data:
-			elementData = {'{#VHOSTNAME}':queueData['vhost'], '{#QUEUENAME}':queueData['name']}
+			elementData = {'{#FQDN}':self.fqdn, '{#VHOSTNAME}':queueData['vhost'], '{#QUEUENAME}':queueData['name']}
 			queues.append(elementData)
 		return json.dumps(queues)
 if __name__ == "__main__":
