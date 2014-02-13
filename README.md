@@ -15,7 +15,8 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 2a. Optionally add a filter. This allows you to restrict the queue list by any parameter in the queue details. It is a JSON-encoded string. Example: FILTER='{"durable": true}'
 3. Import the template to your zabbix server
 4. Make sure zabbix_sender is installed
-5. Restart the local zabbix agent
+6. **WARNING** Watch your process timeout.  I hit an issue with the amount of data and queues in rabbit where processing the results took longer than 3 seconds - that's the default timeout for the agent to kill a process.  If I can switch to a file based push instead of calling send for each item, this will hopefully reduce the time to send even further
+7. Restart the local zabbix agent
 
 ## CHANGES
 Updated to use zabbix_sender to push data on request to an item request.  This is similar to how the FromDual MySQL Zabbix stuff works and the concept was pulled from their templates.  
