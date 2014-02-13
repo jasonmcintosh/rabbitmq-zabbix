@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2014-01-17T19:53:17Z</date>
+    <date>2014-02-13T22:56:04Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -27,13 +27,13 @@
             <items>
                 <item>
                     <name>RabbitMQ Refresh Rabbit Queue Status</name>
-                    <type>7</type>
+                    <type>0</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
                     <key>rabbitmq[queues]</key>
                     <delay>30</delay>
-                    <history>90</history>
+                    <history>7</history>
                     <trends>365</trends>
                     <status>0</status>
                     <value_type>3</value_type>
@@ -608,49 +608,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>rabbitmq[{#VHOSTNAME},queue_messages_unacknowledged,{#QUEUENAME}]</key>
-                            <delay>0</delay>
-                            <history>7</history>
-                            <trends>90</trends>
-                            <status>0</status>
-                            <value_type>3</value_type>
-                            <allowed_hosts/>
-                            <units/>
-                            <delta>0</delta>
-                            <snmpv3_contextname/>
-                            <snmpv3_securityname/>
-                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                            <snmpv3_authpassphrase/>
-                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                            <snmpv3_privpassphrase/>
-                            <formula>1</formula>
-                            <delay_flex/>
-                            <params/>
-                            <ipmi_sensor/>
-                            <data_type>0</data_type>
-                            <authtype>0</authtype>
-                            <username/>
-                            <password/>
-                            <publickey/>
-                            <privatekey/>
-                            <port/>
-                            <description/>
-                            <inventory_link>0</inventory_link>
-                            <applications>
-                                <application>
-                                    <name>rabbitmq data</name>
-                                </application>
-                            </applications>
-                            <valuemap/>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>RabbitMQ  $2 on vhost $1, queue $3</name>
-                            <type>2</type>
-                            <snmp_community/>
-                            <multiplier>0</multiplier>
-                            <snmp_oid/>
-                            <key>rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}]</key>
+                            <key>rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}]</key>
                             <delay>0</delay>
                             <history>7</history>
                             <trends>90</trends>
@@ -734,7 +692,49 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}]</key>
+                            <key>rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}]</key>
+                            <delay>0</delay>
+                            <history>7</history>
+                            <trends>90</trends>
+                            <status>0</status>
+                            <value_type>3</value_type>
+                            <allowed_hosts/>
+                            <units/>
+                            <delta>0</delta>
+                            <snmpv3_contextname/>
+                            <snmpv3_securityname/>
+                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                            <snmpv3_authpassphrase/>
+                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                            <snmpv3_privpassphrase/>
+                            <formula>1</formula>
+                            <delay_flex/>
+                            <params/>
+                            <ipmi_sensor/>
+                            <data_type>0</data_type>
+                            <authtype>0</authtype>
+                            <username/>
+                            <password/>
+                            <publickey/>
+                            <privatekey/>
+                            <port/>
+                            <description/>
+                            <inventory_link>0</inventory_link>
+                            <applications>
+                                <application>
+                                    <name>rabbitmq data</name>
+                                </application>
+                            </applications>
+                            <valuemap/>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>RabbitMQ  $2 on vhost $1, queue $3</name>
+                            <type>2</type>
+                            <snmp_community/>
+                            <multiplier>0</multiplier>
+                            <snmp_oid/>
+                            <key>rabbitmq[{#VHOSTNAME},queue_messages_unacknowledged,{#QUEUENAME}]</key>
                             <delay>0</delay>
                             <history>7</history>
                             <trends>90</trends>
@@ -774,7 +774,7 @@
                     <trigger_prototypes>
                         <trigger_prototype>
                             <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}#0</expression>
-                            <name>No queue consumer and messages found on {#VHOSTNAME}/{#QUEUENAME}</name>
+                            <name>No consumer and messages found on {#VHOSTNAME}/{#QUEUENAME}</name>
                             <url/>
                             <status>0</status>
                             <priority>4</priority>
