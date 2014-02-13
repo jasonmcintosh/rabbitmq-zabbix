@@ -1,7 +1,8 @@
 #!/bin/bash
 #UserParameter=rabbitmq[*],<%= zabbix_script_dir %>/rabbitmq-status.sh
+cd "$(dirname "$0")"
 
-. /etc/zabbix/scripts/.rab.auth
+. .rab.auth
 
 TYPE_OF_CHECK=$1
 METRIC=$2
@@ -11,5 +12,5 @@ METRIC=$2
 # This assumes that the server is going to then use zabbix_sender to feed the data BACK to the server.  Right now, I'm doing that
 # in the python script
 
-/etc/zabbix/scripts/api.py --username=$USERNAME --password=$PASSWORD --check=$TYPE_OF_CHECK --metric=$METRIC
+./api.py --username=$USERNAME --password=$PASSWORD --check=$TYPE_OF_CHECK --metric=$METRIC
 

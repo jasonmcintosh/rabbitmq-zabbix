@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App RabbitMQ</template>
-            <name>Template App RabbitMQ</name>
+            <template>Template App RabbitMQ v2</template>
+            <name>Template App RabbitMQ v2</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -773,7 +773,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ:rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 &amp; {Template App RabbitMQ:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}#0</expression>
+                            <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}#0</expression>
                             <name>No queue consumer and messages found on {#VHOSTNAME}/{#QUEUENAME}</name>
                             <url/>
                             <status>0</status>
@@ -782,7 +782,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>({Template App RabbitMQ:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;1000)</expression>
+                            <expression>({Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;1000)</expression>
                             <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - CRITICAL</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
@@ -791,7 +791,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;500 &amp; {Template App RabbitMQ:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;1000</expression>
+                            <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;500 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;1000</expression>
                             <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - Warning</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
@@ -811,7 +811,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App RabbitMQ:rabbitmq.server.filedesc.percentused.last(0)}&gt;50</expression>
+            <expression>{Template App RabbitMQ v2:rabbitmq.server.filedesc.percentused.last(0)}&gt;50</expression>
             <name>Percent file descriptors greater than 50%</name>
             <url/>
             <status>0</status>
@@ -821,7 +821,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ:rabbitmq.server.filedesc.percentused.last(0)}&gt;75</expression>
+            <expression>{Template App RabbitMQ v2:rabbitmq.server.filedesc.percentused.last(0)}&gt;75</expression>
             <name>Percent file descriptors greater than 75%</name>
             <url/>
             <status>0</status>
@@ -831,7 +831,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ:rabbitmq.server.mem.percentused.last(0)}&gt;50</expression>
+            <expression>{Template App RabbitMQ v2:rabbitmq.server.mem.percentused.last(0)}&gt;50</expression>
             <name>Percent memory use greater than 50%</name>
             <url/>
             <status>0</status>
@@ -841,7 +841,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
+            <expression>{Template App RabbitMQ v2:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
             <name>Percent memory use greater than 75%</name>
             <url/>
             <status>0</status>
@@ -851,7 +851,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ:rabbitmq.server.sockets.percentused.last(0)}&gt;50</expression>
+            <expression>{Template App RabbitMQ v2:rabbitmq.server.sockets.percentused.last(0)}&gt;50</expression>
             <name>Percent sockets in use greater than 50%</name>
             <url/>
             <status>0</status>
@@ -861,7 +861,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ:rabbitmq.server.sockets.percentused.last(0)}&gt;75</expression>
+            <expression>{Template App RabbitMQ v2:rabbitmq.server.sockets.percentused.last(0)}&gt;75</expression>
             <name>Percent sockets in use greater than 75%</name>
             <url/>
             <status>0</status>
@@ -871,7 +871,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ:net.tcp.port[127.0.0.1,5672].last(0)}=0</expression>
+            <expression>{Template App RabbitMQ v2:net.tcp.port[127.0.0.1,5672].last(0)}=0</expression>
             <name>RabbitMQ is down on {HOSTNAME}</name>
             <url/>
             <status>0</status>
