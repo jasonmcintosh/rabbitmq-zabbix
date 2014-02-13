@@ -28,3 +28,4 @@ Feel free to submit changes or ideas - mcintoshj@gmail.com
 ## Definite kudo's to some of the other developers around the web.  In particularly,
 * Ptyhon Scripts: https://github.com/kmcminn/rabbit-nagios
 * Base idea for the Rabbit template:  https://github.com/alfss/zabbix-rabbitmq
+* Also need to thank Lewis Franklin https://github.com/brolewis for his contributions!
