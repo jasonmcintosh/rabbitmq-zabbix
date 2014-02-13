@@ -13,4 +13,3 @@ METRIC=$2
 # in the python script
 
 ./api.py --username=$USERNAME --password=$PASSWORD --check=$TYPE_OF_CHECK --metric=$METRIC
-

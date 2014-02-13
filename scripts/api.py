@@ -7,7 +7,7 @@ import socket
 import time
 import urllib2
 import subprocess
-
+import os
 
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
@@ -52,6 +52,7 @@ class RabbitMQAPI(object):
         return [x['name'] for x in self.call_api('nodes')]
 
     def check_queue(self):
+	returnCode = 0
         '''Return the value for a specific item in a queue's details.'''
         data = self.call_api('queues')
 	for queueData in data:
@@ -61,9 +62,10 @@ class RabbitMQAPI(object):
 				zabbixValue=queueData[itemData]
 			else:
 				zabbixValue=0
-			returnCode=subprocess.call('zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue), shell=True)
-			print 'Response of ' + str(returnCode) + ' zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue)
-
+			with open(os.devnull, 'w') as devnull:
+				returnCode |=subprocess.call('zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue), shell=True, stdout=devnull, stderr=devnull)
+			#print 'Response of ' + str(returnCode) + ' zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue)
+	return returnCode
     def check_aliveness(self):
         '''Check the aliveness status of a given vhost.'''
         return self.call_api('aliveness-test/%2f')['status']
@@ -100,7 +102,7 @@ def main():
     elif options.check == 'list_nodes':
         print json.dumps({'data': api.list_nodes()})
     elif options.check == 'queues':
-        api.check_queue()
+        print api.check_queue()
     elif options.check == 'check_aliveness':
         print api.check_aliveness()
     elif options.check == 'server':
