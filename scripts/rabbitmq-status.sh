@@ -12,4 +12,4 @@ METRIC=$2
 # This assumes that the server is going to then use zabbix_sender to feed the data BACK to the server.  Right now, I'm doing that
 # in the python script
 
-./api.py --username=$USERNAME --password=$PASSWORD --check=$TYPE_OF_CHECK --metric=$METRIC
+./api.py --username=$USERNAME --password=$PASSWORD --check=$TYPE_OF_CHECK --metric=$METRIC --filters=$FILTER
