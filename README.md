@@ -19,7 +19,9 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 7. Restart the local zabbix agent
 
 Note courtesy of Lewis Franklin, you can set a filter on what is monitored to use only a specific set of queues.  Right now, you have to specify each of the queues you want monitored in a format like:
-FILTER='{"name":"test_queue_two"}'
+FILTER='[{"name":"test_queue_two"}, {"name":"test_queue"} ]'
+Note, this IS a change from previous structure
+
 At some point I will probably make this more intelligent to allow regular expressions or more "ignore these queues" kind of things
 
 
