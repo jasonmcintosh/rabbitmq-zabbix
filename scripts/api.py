@@ -41,8 +41,10 @@ class RabbitMQAPI(object):
             if filters:
                 ## Check each filter element against the current queue and only
                 ## there are any mismatches, don't add that queue.
-                if not [x for x in filters if filters[x] != queue.get(x)]:
-                    queues.append(element)
+		for x in filters:
+			key = x.keys()[0]
+			if x.get(key) == queue.get(key):
+				queues.append(element)
             else:
                 queues.append(element)
         return queues
@@ -58,15 +60,17 @@ class RabbitMQAPI(object):
 		for itemData in self.queueOptions:
 			## Check each filter element against the current queue and only
 			## there are any mismatches, don't add that queue.
-			if not filters or [x for x in filters if filters[x] == queueData.get(x)]:
-				zabbixKey="\"rabbitmq["+queueData['vhost']+",queue_"+itemData+","+queueData['name']+"]\""
-				if queueData.get(itemData):
-					zabbixValue=queueData[itemData]
-				else:
-					zabbixValue=0
-				with open(os.devnull, 'w') as devnull:
-					returnCode |=subprocess.call('zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue), shell=True, stdout=devnull, stderr=devnull)
-					#print 'Response of ' + str(returnCode) + ' zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue)
+			for x in filters:
+				key = x.keys()[0]
+				if x.get(key) == queueData.get(key):
+					zabbixKey="\"rabbitmq["+queueData['vhost']+",queue_"+itemData+","+queueData['name']+"]\""
+					if queueData.get(itemData):
+						zabbixValue=queueData[itemData]
+					else:
+						zabbixValue=0
+					with open(os.devnull, 'w') as devnull:
+						returnCode |=subprocess.call('zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue), shell=True, stdout=devnull, stderr=devnull)
+						#print 'Response of ' + str(returnCode) + ' zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k '+zabbixKey + ' -o ' + str(zabbixValue)
 	return returnCode
     def check_aliveness(self):
         '''Check the aliveness status of a given vhost.'''
@@ -97,7 +101,7 @@ def main():
 	    except KeyError:
 		parser.error('Invalid filters object.')
 	else:
-		filters = {}
+		filters = []
 	if options.check == 'list_queues':
 		print json.dumps({'data': api.list_queues(filters)})
 	elif options.check == 'list_nodes':
