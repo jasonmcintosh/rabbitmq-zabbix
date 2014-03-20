@@ -33,10 +33,12 @@ class RabbitMQAPI(object):
         in .rab.auth. See README.md for more information.
         '''
         queues = []
+        if not filters:
+            filters = [{}]
         for queue in self.call_api('queues'):
             for _filter in filters:
-                check = {x: y for x, y in queue.items() if x in _filter}
-                shared_items = set(_filter.items()) & set(check.items())
+                check = [(x, y) for x, y in queue.items() if x in _filter]
+                shared_items = set(_filter.items()).intersection(check)
                 if len(shared_items) == len(_filter):
                     element = {'{#VHOSTNAME}': queue['vhost'],
                                '{#QUEUENAME}': queue['name']}
@@ -52,22 +54,23 @@ class RabbitMQAPI(object):
         for queue in self.call_api('queues'):
             success = False
             for _filter in filters:
-                check = {x: y for x, y in queue.items() if x in _filter}
-                shared_items = set(_filter.items()) & set(check.items())
+                check = [(x, y) for x, y in queue.items() if x in _filter]
+                shared_items = set(_filter.items()).intersection(check)
                 if len(shared_items) == len(_filter):
                     success = True
                     break
             if success:
-                return_code += self._send_data(queue)
+                return_code |= self._send_data(queue)
         return return_code
 
     def _send_data(self, queue):
         '''Send the queue data to Zabbix.'''
-        args = 'zabbix_sender -c {} -k {} -o {}'
+        args = 'zabbix_sender -c {0} -k {1} -o {2}'
         for item in ('memory', 'messages', 'messages_unacknowledged',
                      'consumers'):
             queue['item'] = item
-            key = '"rabbitmq[{vhost},queue_{item},{name}]"'.format(**queue)
+            key = '"rabbitmq[{0},queue_{1},{2}]"'
+            key = key.format(queue['vhost'], queue['item'], queue['name'])
             value = queue.get(item, 0)
             return subprocess.call(args.format(self.conf, key, value),
                                    shell=True, stdout=subprocess.PIPE,
@@ -113,7 +116,7 @@ def main():
         except KeyError:
             parser.error('Invalid filters object.')
     else:
-        filters = []
+        filters = [{}]
     if not isinstance(filters, (list, tuple)):
         filters = [filters]
     if options.check == 'list_queues':
