@@ -66,13 +66,15 @@ class RabbitMQAPI(object):
     def _send_data(self, queue):
         '''Send the queue data to Zabbix.'''
         args = 'zabbix_sender -c {0} -k {1} -o {2}'
-	return_code = 0
-        for item in ['memory', 'messages', 'messages_unacknowledged', 'consumers']:
+        return_code = 0
+        for item in ['memory', 'messages', 'messages_unacknowledged',
+                     'consumers']:
             key = '"rabbitmq[{0},queue_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get(item, 0)
-	    #print "Executing ", args.format(self.conf, key, value)
-	    return_code |= subprocess.call(args.format(self.conf, key, value), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            return_code |= subprocess.call(args.format(self.conf, key, value),
+                                           shell=True, stdout=subprocess.PIPE,
+                                           stderr=subprocess.STDOUT)
         return return_code
 
     def check_aliveness(self):
