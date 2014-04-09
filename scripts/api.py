@@ -6,7 +6,8 @@ import optparse
 import socket
 import urllib2
 import subprocess
-
+import tempfile
+import os
 
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
@@ -51,6 +52,9 @@ class RabbitMQAPI(object):
         return_code = 0
         if not filters:
             filters = [{}]
+
+        rdatafile = tempfile.NamedTemporaryFile(delete=False)
+
         for queue in self.call_api('queues'):
             success = False
             for _filter in filters:
@@ -60,19 +64,27 @@ class RabbitMQAPI(object):
                     success = True
                     break
             if success:
-                return_code |= self._send_data(queue)
+                self._prepare_data(queue, rdatafile)
+
+        rdatafile.close()
+        return_code |= self._send_data(rdatafile)
+        os.unlink(rdatafile.name)
         return return_code
 
-    def _send_data(self, queue):
-        '''Send the queue data to Zabbix.'''
-        args = 'zabbix_sender -c {0} -k {1} -o {2}'
-        return_code = 0
+    def _prepare_data(self, queue, tmpfile):
+        '''Prepare the queue data for sending'''
         for item in ['memory', 'messages', 'messages_unacknowledged',
                      'consumers']:
             key = '"rabbitmq[{0},queue_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get(item, 0)
-            return_code |= subprocess.call(args.format(self.conf, key, value),
+            tmpfile.write("- %s %s\n" % (key, value))
+
+    def _send_data(self, tmpfile):
+        '''Send the queue data to Zabbix.'''
+        args = 'zabbix_sender -c {0} -i {1}'
+        return_code = 0
+        return_code |= subprocess.call(args.format(self.conf, tmpfile.name),
                                            shell=True, stdout=subprocess.PIPE,
                                            stderr=subprocess.STDOUT)
         return return_code
