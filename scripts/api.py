@@ -47,6 +47,16 @@ class RabbitMQAPI(object):
                     break
         return queues
 
+    def list_nodes(self):
+        '''Lists all rabbitMQ nodes in the cluster'''
+        nodes = []
+        for node in self.call_api('nodes'):
+            #name = node['name'].split('@')[1]
+            element = {'{#NODENAME}': node['name'],
+                       '{#NODETYPE}': node['type']}
+            nodes.append(element)
+        return nodes
+
     def check_queue(self, filters=None):
         '''Return the value for a specific item in a queue's details.'''
         return_code = 0
@@ -102,7 +112,8 @@ class RabbitMQAPI(object):
 
 def main():
     '''Command-line parameters and decoding for Zabbix use/consumption.'''
-    choices = ['list_queues', 'queues', 'check_aliveness', 'server']
+    choices = ['list_queues', 'list_nodes', 'queues', 'check_aliveness', 
+               'server']
     parser = optparse.OptionParser()
     parser.add_option('--username', help='RabbitMQ API username',
                       default='guest')
@@ -116,6 +127,7 @@ def main():
                       help='Type of check')
     parser.add_option('--metric', help='Which metric to evaluate', default='')
     parser.add_option('--filters', help='Filter used queues (see README)')
+    parser.add_option('--node', help='Which node to check (valid for --check=server)')
     parser.add_option('--conf', default='/etc/zabbix/zabbix_agentd.conf')
     (options, args) = parser.parse_args()
     if not options.check:
@@ -134,6 +146,8 @@ def main():
         filters = [filters]
     if options.check == 'list_queues':
         print json.dumps({'data': api.list_queues(filters)})
+    elif options.check == 'list_nodes':
+        print json.dumps({'data': api.list_nodes()})
     elif options.check == 'queues':
         print api.check_queue(filters)
     elif options.check == 'check_aliveness':
@@ -142,7 +156,10 @@ def main():
         if not options.metric:
             parser.error('Missing required parameter: "metric"')
         else:
-            print api.check_server(options.metric)
+            if options.node != '':
+                print api.check_server(options.metric, options.node)
+            else:
+                print api.check_server(options.metric)
 
 if __name__ == '__main__':
     main()
