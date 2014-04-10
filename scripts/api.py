@@ -51,8 +51,10 @@ class RabbitMQAPI(object):
         '''Lists all rabbitMQ nodes in the cluster'''
         nodes = []
         for node in self.call_api('nodes'):
-            #name = node['name'].split('@')[1]
-            element = {'{#NODENAME}': node['name'],
+            # We need to return the node name, because Zabbix
+            # does not support @ as an item paramater
+            name = node['name'].split('@')[1]
+            element = {'{#NODENAME}': name,
                        '{#NODETYPE}': node['type']}
             nodes.append(element)
         return nodes
@@ -107,6 +109,8 @@ class RabbitMQAPI(object):
         '''Return the value for a specific item in a node's details.'''
         if not node_name:
             node_name = 'rabbit@{0}'.format(self.host_name)
+        else:
+            node_name = 'rabbit@{0}'.format(node_name)
         return self.call_api('nodes/{0}'.format(node_name)).get(item)
 
 
