@@ -16,12 +16,12 @@ class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
 
     def __init__(self, user_name='guest', password='guest', host_name='',
-                 port=15672, conf='/etc/zabbix/zabbix_agentd.conf'):
+                 port=15672, conf='etc/zabbix/zabbix_agentd.conf'):
         self.user_name = user_name
         self.password = password
         self.host_name = host_name or socket.gethostname()
         self.port = port
-        self.conf = conf
+        self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
 
     def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
@@ -139,8 +139,6 @@ def main():
     (options, args) = parser.parse_args()
     if not options.check:
         parser.error('At least one check should be specified')
-    if not options.conf:
-        options.conf = '/etc/zabbix/zabbix_agentd.conf'
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
                       conf=options.conf)
