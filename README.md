@@ -3,6 +3,9 @@ rabbitmq-zabbix
 
 Template and checks to monitor rabbitmq queues and server via Zabbix.
 
+## SOURCE: 
+https://github.com/jasonmcintosh/rabbitmq-zabbix
+
 ## WHY:
 Because the SNMP plugin isn't an officially supported plugin, and rabbitmqctl based monitors are REALLY slow in comparison.
 
@@ -52,6 +55,8 @@ At some point the filters may be improved to include regular expressions or "ign
 Add a local cache of the results (may be overkill for RabbitMQ).
 Feel free to submit changes or ideas - mcintoshj@gmail.com
 
+Repo:
+https://github.com/jasonmcintosh/rabbitmq-zabbix
 
 ## Definite kudos to some of the other developers around the web.  In particular,
 * Python Scripts: https://github.com/kmcminn/rabbit-nagios

@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# https://github.com/jasonmcintosh/rabbitmq-zabbix
+#
 #UserParameter=rabbitmq[*],<%= zabbix_script_dir %>/rabbitmq-status.sh
 cd "$(dirname "$0")"
 
