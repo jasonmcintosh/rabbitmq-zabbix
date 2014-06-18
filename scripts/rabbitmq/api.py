@@ -139,6 +139,8 @@ def main():
     (options, args) = parser.parse_args()
     if not options.check:
         parser.error('At least one check should be specified')
+    if not options.conf:
+        options.conf = '/etc/zabbix/zabbix_agentd.conf'
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
                       conf=options.conf)
