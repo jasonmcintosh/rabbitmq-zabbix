@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2014-02-13T22:56:04Z</date>
+    <date>2014-07-08T21:27:56Z</date>
     <groups>
+        <group>
+            <name>Rabbit Servers</name>
+        </group>
         <group>
             <name>Templates</name>
         </group>
@@ -12,6 +15,9 @@
             <template>Template App RabbitMQ v2</template>
             <name>Template App RabbitMQ v2</name>
             <groups>
+                <group>
+                    <name>Rabbit Servers</name>
+                </group>
                 <group>
                     <name>Templates</name>
                 </group>
@@ -27,13 +33,13 @@
             <items>
                 <item>
                     <name>RabbitMQ Refresh Rabbit Queue Status</name>
-                    <type>0</type>
+                    <type>7</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
                     <key>rabbitmq[queues]</key>
                     <delay>30</delay>
-                    <history>7</history>
+                    <history>90</history>
                     <trends>365</trends>
                     <status>0</status>
                     <value_type>3</value_type>
@@ -603,6 +609,48 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
+                            <name>RabbitMQ $2 on vhost $1, queue $3</name>
+                            <type>2</type>
+                            <snmp_community/>
+                            <multiplier>0</multiplier>
+                            <snmp_oid/>
+                            <key>rabbitmq[{#VHOSTNAME},queue_message_stats_deliver_get,{#QUEUENAME}]</key>
+                            <delay>0</delay>
+                            <history>7</history>
+                            <trends>365</trends>
+                            <status>0</status>
+                            <value_type>3</value_type>
+                            <allowed_hosts/>
+                            <units/>
+                            <delta>1</delta>
+                            <snmpv3_contextname/>
+                            <snmpv3_securityname/>
+                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                            <snmpv3_authpassphrase/>
+                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                            <snmpv3_privpassphrase/>
+                            <formula>1</formula>
+                            <delay_flex/>
+                            <params/>
+                            <ipmi_sensor/>
+                            <data_type>0</data_type>
+                            <authtype>0</authtype>
+                            <username/>
+                            <password/>
+                            <publickey/>
+                            <privatekey/>
+                            <port/>
+                            <description>Rate of message delivery to a consumer per queue</description>
+                            <inventory_link>0</inventory_link>
+                            <applications>
+                                <application>
+                                    <name>rabbitmq data</name>
+                                </application>
+                            </applications>
+                            <valuemap/>
+                        </item_prototype>
+                        <item_prototype>
                             <name>RabbitMQ  $2 on vhost $1, queue $3</name>
                             <type>2</type>
                             <snmp_community/>
@@ -773,16 +821,25 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}#0</expression>
-                            <name>No consumer and messages found on {#VHOSTNAME}/{#QUEUENAME}</name>
+                            <expression>({Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].nodata(10m)}=1)</expression>
+                            <name>No data received on queue {#QUEUENAME} in 10 minutes.</name>
                             <url/>
                             <status>0</status>
                             <priority>4</priority>
+                            <description>No data received on queue #QUEUENAME</description>
+                            <type>0</type>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}#0</expression>
+                            <name>No queue consumer and messages found on {#VHOSTNAME}/{#QUEUENAME}</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>3</priority>
                             <description/>
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>({Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;1000)</expression>
+                            <expression>({Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;200000)</expression>
                             <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - CRITICAL</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
@@ -791,7 +848,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;500 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;1000</expression>
+                            <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;100000&amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;200000</expression>
                             <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - Warning</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>

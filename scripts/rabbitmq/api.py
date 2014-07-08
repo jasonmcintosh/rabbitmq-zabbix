@@ -94,6 +94,12 @@ class RabbitMQAPI(object):
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get(item, 0)
             tmpfile.write("- %s %s\n" % (key, value))
+        ##  This is a non standard bit of information added after the standard items
+        key = '"rabbitmq[{0},queue_message_stats_deliver_get,{1}]"'
+        key = key.format(queue['vhost'], queue['name'])
+        value = queue.get('message_stats', {}).get('deliver_get', 0)
+        tmpfile.write("- %s %s\n" % (key, value))
+		
 
     def _send_data(self, tmpfile):
         '''Send the queue data to Zabbix.'''
