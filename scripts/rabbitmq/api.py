@@ -120,6 +120,8 @@ class RabbitMQAPI(object):
             node_name = 'rabbit@{0}'.format(self.host_name)
         else:
             node_name = 'rabbit@{0}'.format(node_name)
+        if item == 'message_stats_deliver_get':
+	    return self.call_api('overview').get('message_stats', {}).get('deliver_get',0)
         return self.call_api('nodes/{0}'.format(node_name)).get(item)
 
 
