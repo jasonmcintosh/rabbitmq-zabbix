@@ -95,11 +95,11 @@ class RabbitMQAPI(object):
             value = queue.get(item, 0)
             tmpfile.write("- %s %s\n" % (key, value))
         ##  This is a non standard bit of information added after the standard items
-        key = '"rabbitmq[{0},queue_message_stats_deliver_get,{1}]"'
-        key = key.format(queue['vhost'], queue['name'])
-        value = queue.get('message_stats', {}).get('deliver_get', 0)
-        tmpfile.write("- %s %s\n" % (key, value))
-		
+        for item in ['deliver_get', 'publish']:
+            key = '"rabbitmq[{0},queue_message_stats_{1},{2}]"'
+            key = key.format(queue['vhost'], item, queue['name'])
+            value = queue.get('message_stats', {}).get(item, 0)
+            tmpfile.write("- %s %s\n" % (key, value))
 
     def _send_data(self, tmpfile):
         '''Send the queue data to Zabbix.'''
@@ -120,14 +120,17 @@ class RabbitMQAPI(object):
             node_name = 'rabbit@{0}'.format(self.host_name)
         else:
             node_name = 'rabbit@{0}'.format(node_name)
+        ##I need to find a cleaner way on sub items here... Perhaps additional parameters, or splitting they key by "."
         if item == 'message_stats_deliver_get':
 	    return self.call_api('overview').get('message_stats', {}).get('deliver_get',0)
+        elif item == 'message_stats_publish':
+	    return self.call_api('overview').get('message_stats', {}).get('publish',0)
         return self.call_api('nodes/{0}'.format(node_name)).get(item)
 
 
 def main():
     '''Command-line parameters and decoding for Zabbix use/consumption.'''
-    choices = ['list_queues', 'list_nodes', 'queues', 'check_aliveness', 
+    choices = ['list_queues', 'list_nodes', 'queues', 'check_aliveness',
                'server']
     parser = optparse.OptionParser()
     parser.add_option('--username', help='RabbitMQ API username',
