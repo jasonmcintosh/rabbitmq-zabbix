@@ -499,7 +499,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>rabbitmq[server,version]</key>
+                    <key>rabbitmq[server,rabbitmq_version]</key>
                     <delay>3600</delay>
                     <history>90</history>
                     <trends>365</trends>

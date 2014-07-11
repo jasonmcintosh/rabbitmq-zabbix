@@ -125,6 +125,8 @@ class RabbitMQAPI(object):
 	    return self.call_api('overview').get('message_stats', {}).get('deliver_get',0)
         elif item == 'message_stats_publish':
 	    return self.call_api('overview').get('message_stats', {}).get('publish',0)
+        elif item == 'rabbitmq_version':
+	    return self.call_api('overview').get('rabbitmq_version', 'None')
         return self.call_api('nodes/{0}'.format(node_name)).get(item)
 
 
