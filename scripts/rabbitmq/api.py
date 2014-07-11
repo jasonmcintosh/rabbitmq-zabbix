@@ -114,20 +114,20 @@ class RabbitMQAPI(object):
         '''Check the aliveness status of a given vhost.'''
         return self.call_api('aliveness-test/%2f')['status']
 
-    def check_server(self, item, node_name=None):
-        '''Return the value for a specific item in a node's details.'''
-        if not node_name:
-            node_name = 'rabbit@{0}'.format(self.host_name)
-        else:
-            node_name = 'rabbit@{0}'.format(node_name)
-        ##I need to find a cleaner way on sub items here... Perhaps additional parameters, or splitting they key by "."
+    def check_server(self, item, node_name):
+        '''First, check the overview specific items'''
         if item == 'message_stats_deliver_get':
 	    return self.call_api('overview').get('message_stats', {}).get('deliver_get',0)
         elif item == 'message_stats_publish':
 	    return self.call_api('overview').get('message_stats', {}).get('publish',0)
         elif item == 'rabbitmq_version':
 	    return self.call_api('overview').get('rabbitmq_version', 'None')
-        return self.call_api('nodes/{0}'.format(node_name)).get(item)
+        '''Return the value for a specific item in a node's details.'''
+        node_name = node_name.split('.')[0]
+        for nodeData in self.call_api('nodes'):
+            if node_name in nodeData['name']:
+                return nodeData.get(item)
+        return 'Not Found'
 
 
 def main():
@@ -179,7 +179,7 @@ def main():
             if options.node != '':
                 print api.check_server(options.metric, options.node)
             else:
-                print api.check_server(options.metric)
+                print api.check_server(options.metric, api.host_name)
 
 if __name__ == '__main__':
     main()
