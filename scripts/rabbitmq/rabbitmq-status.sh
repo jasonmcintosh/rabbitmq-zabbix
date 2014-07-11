@@ -11,6 +11,12 @@ TYPE_OF_CHECK=$1
 METRIC=$2
 NODE=$3
 
+if [[ -z "$HOSTNAME" ]]; then
+    HOSTNAME=`hostname`
+fi
+if [[ -z "$NODE" ]]; then
+    NODE=`hostname`
+fi
 #rabbitmq[queues]
 #rabbitmq[server,disk_free]
 
