@@ -1008,7 +1008,7 @@
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 &amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}#0</expression>
-                            <name>No queue consumer and messages found on {#VHOSTNAME}/{#QUEUENAME}</name>
+                            <name>No queue consumer and messages found on {#NODENAME}: {#VHOSTNAME}->{#QUEUENAME}</name>
                             <url/>
                             <status>0</status>
                             <priority>3</priority>
@@ -1017,7 +1017,7 @@
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>({Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;200000)</expression>
-                            <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - CRITICAL</name>
+                            <name>{#NODENAME}: {#VHOSTNAME}->{#QUEUENAME} - CRITICAL</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
                             <priority>4</priority>
@@ -1026,7 +1026,7 @@
                         </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;100000&amp; {Template App RabbitMQ v2:rabbitmq[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;200000</expression>
-                            <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - Warning</name>
+                            <name>{#NODENAME}: {#VHOSTNAME}->{#QUEUENAME} - Warning</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
                             <priority>2</priority>
