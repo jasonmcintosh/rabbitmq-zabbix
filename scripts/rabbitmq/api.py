@@ -11,17 +11,21 @@ import urllib2
 import subprocess
 import tempfile
 import os
+import logging
+
+logging.basicConfig(filename='/var/log/zabbix/rabbitmq_zabbix.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
 
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
 
     def __init__(self, user_name='guest', password='guest', host_name='',
-                 port=15672, conf='etc/zabbix/zabbix_agentd.conf'):
+                 port=15672, conf='etc/zabbix/zabbix_agentd.conf', senderhostname=None):
         self.user_name = user_name
         self.password = password
         self.host_name = host_name or socket.gethostname()
         self.port = port
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
+        self.senderhostname = senderhostname
 
     def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
@@ -29,6 +33,7 @@ class RabbitMQAPI(object):
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, self.user_name, self.password)
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
+        logging.debug('Issue a rabbit API call to get data on ' + path)
         return json.loads(urllib2.build_opener(handler).open(url).read())
 
     def list_queues(self, filters=None):
@@ -40,6 +45,7 @@ class RabbitMQAPI(object):
         if not filters:
             filters = [{}]
         for queue in self.call_api('queues'):
+            logging.debug("Discovered queue " + queue['name'] + ", checking to see if it's filtered...")
             for _filter in filters:
                 check = [(x, y) for x, y in queue.items() if x in _filter]
                 shared_items = set(_filter.items()).intersection(check)
@@ -47,6 +53,7 @@ class RabbitMQAPI(object):
                     element = {'{#VHOSTNAME}': queue['vhost'],
                                '{#QUEUENAME}': queue['name']}
                     queues.append(element)
+                    logging.debug('Discovered queue '+queue['vhost']+' -> '+queue['name'])
                     break
         return queues
 
@@ -60,6 +67,7 @@ class RabbitMQAPI(object):
             element = {'{#NODENAME}': name,
                        '{#NODETYPE}': node['type']}
             nodes.append(element)
+            logging.debug('Discovered nodes '+name+' -> '+node['type'])
         return nodes
 
     def check_queue(self, filters=None):
@@ -72,6 +80,7 @@ class RabbitMQAPI(object):
 
         for queue in self.call_api('queues'):
             success = False
+            logging.debug("Filtering out by " + str(filters))
             for _filter in filters:
                 check = [(x, y) for x, y in queue.items() if x in _filter]
                 shared_items = set(_filter.items()).intersection(check)
@@ -82,7 +91,7 @@ class RabbitMQAPI(object):
                 self._prepare_data(queue, rdatafile)
 
         rdatafile.close()
-        return_code |= self._send_data(rdatafile)
+        return_code = self._send_data(rdatafile)
         os.unlink(rdatafile.name)
         return return_code
 
@@ -93,22 +102,36 @@ class RabbitMQAPI(object):
             key = '"rabbitmq[{0},queue_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get(item, 0)
+            logging.debug("SENDER_DATA: - %s %s" % (key,value))
             tmpfile.write("- %s %s\n" % (key, value))
         ##  This is a non standard bit of information added after the standard items
         for item in ['deliver_get', 'publish']:
             key = '"rabbitmq[{0},queue_message_stats_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get('message_stats', {}).get(item, 0)
+            logging.debug("SENDER_DATA: - %s %s" % (key,value))
             tmpfile.write("- %s %s\n" % (key, value))
 
     def _send_data(self, tmpfile):
         '''Send the queue data to Zabbix.'''
         args = 'zabbix_sender -c {0} -i {1}'
+        if self.senderhostname:
+            args = args + " -s " + self.senderhostname
         return_code = 0
-        return_code |= subprocess.call(args.format(self.conf, tmpfile.name),
+        process = subprocess.Popen(args.format(self.conf, tmpfile.name),
                                            shell=True, stdout=subprocess.PIPE,
-                                           stderr=subprocess.STDOUT)
-        return return_code
+                                           stderr=subprocess.PIPE)
+        out, err = process.communicate()
+        logging.debug("Finished sending data")
+        return_code = process.wait()
+        logging.info("Found return code of " + str(return_code))
+        if return_code != 0:
+            logging.warning(out)
+            logging.warning(err)
+        else:
+            logging.debug(err)
+            logging.debug(out)
+          return return_code
 
     def check_aliveness(self):
         '''Check the aliveness status of a given vhost.'''
@@ -117,11 +140,11 @@ class RabbitMQAPI(object):
     def check_server(self, item, node_name):
         '''First, check the overview specific items'''
         if item == 'message_stats_deliver_get':
-	    return self.call_api('overview').get('message_stats', {}).get('deliver_get',0)
+          return self.call_api('overview').get('message_stats', {}).get('deliver_get',0)
         elif item == 'message_stats_publish':
-	    return self.call_api('overview').get('message_stats', {}).get('publish',0)
+          return self.call_api('overview').get('message_stats', {}).get('publish',0)
         elif item == 'rabbitmq_version':
-	    return self.call_api('overview').get('rabbitmq_version', 'None')
+          return self.call_api('overview').get('rabbitmq_version', 'None')
         '''Return the value for a specific item in a node's details.'''
         node_name = node_name.split('.')[0]
         for nodeData in self.call_api('nodes'):
@@ -149,12 +172,14 @@ def main():
     parser.add_option('--filters', help='Filter used queues (see README)')
     parser.add_option('--node', help='Which node to check (valid for --check=server)')
     parser.add_option('--conf', default='/etc/zabbix/zabbix_agentd.conf')
+    parser.add_option('--senderhostname', default='', help='Allows including a sender parameter on calls to zabbix_sender')
     (options, args) = parser.parse_args()
     if not options.check:
         parser.error('At least one check should be specified')
+    logging.debug("Started trying to process data")
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
-                      conf=options.conf)
+                      conf=options.conf, senderhostname=options.senderhostname)
     if options.filters:
         try:
             filters = json.loads(options.filters)
@@ -176,7 +201,7 @@ def main():
         if not options.metric:
             parser.error('Missing required parameter: "metric"')
         else:
-            if options.node != '':
+            if options.node:
                 print api.check_server(options.metric, options.node)
             else:
                 print api.check_server(options.metric, api.host_name)
