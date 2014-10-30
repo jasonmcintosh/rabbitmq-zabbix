@@ -13,7 +13,7 @@ import tempfile
 import os
 import logging
 
-logging.basicConfig(filename='/var/log/zabbix/rabbitmq_zabbix.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
+logging.basicConfig(filename='/var/log/zabbix/rabbitmq_zabbix.log', level=logging.WARNING, format='%(asctime)s %(levelname)s: %(message)s')
 
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
