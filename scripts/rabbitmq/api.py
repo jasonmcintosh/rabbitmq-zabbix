@@ -131,7 +131,7 @@ class RabbitMQAPI(object):
         else:
             logging.debug(err)
             logging.debug(out)
-          return return_code
+        return return_code
 
     def check_aliveness(self):
         '''Check the aliveness status of a given vhost.'''
