@@ -12,8 +12,8 @@
     </groups>
     <templates>
         <template>
-            <template>RabbitMQ v2</template>
-            <name>RabbitMQ v2</name>
+            <template>Template App RabbitMQ v3</template>
+            <name>Template App RabbitMQ v3</name>
             <description/>
             <groups>
                 <group>
