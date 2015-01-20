@@ -1,7 +1,6 @@
 #!/usr/bin/env /usr/bin/python
 '''Python module to query the RabbitMQ Management Plugin REST API and get
 results that can then be used by Zabbix.
-
 https://github.com/jasonmcintosh/rabbitmq-zabbix
 '''
 import json
@@ -53,7 +52,7 @@ class RabbitMQAPI(object):
                     element = {'{#VHOSTNAME}': queue['vhost'],
                                '{#QUEUENAME}': queue['name']}
                     queues.append(element)
-                    logging.debug('Discovered queue '+queue['vhost']+' -> '+queue['name'])
+                    logging.debug('Discovered queue '+queue['vhost']+'/'+queue['name'])
                     break
         return queues
 
@@ -62,12 +61,12 @@ class RabbitMQAPI(object):
         nodes = []
         for node in self.call_api('nodes'):
             # We need to return the node name, because Zabbix
-            # does not support @ as an item paramater
+            # does not support @ as an item parameter
             name = node['name'].split('@')[1]
             element = {'{#NODENAME}': name,
                        '{#NODETYPE}': node['type']}
             nodes.append(element)
-            logging.debug('Discovered nodes '+name+' -> '+node['type'])
+            logging.debug('Discovered nodes '+name+'/'+node['type'])
         return nodes
 
     def check_queue(self, filters=None):
@@ -99,14 +98,14 @@ class RabbitMQAPI(object):
         '''Prepare the queue data for sending'''
         for item in ['memory', 'messages', 'messages_unacknowledged',
                      'consumers']:
-            key = '"rabbitmq[{0},queue_{1},{2}]"'
+            key = '"rabbitmq.queues[{0},queue_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get(item, 0)
             logging.debug("SENDER_DATA: - %s %s" % (key,value))
             tmpfile.write("- %s %s\n" % (key, value))
         ##  This is a non standard bit of information added after the standard items
         for item in ['deliver_get', 'publish']:
-            key = '"rabbitmq[{0},queue_message_stats_{1},{2}]"'
+            key = '"rabbitmq.queues[{0},queue_message_stats_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get('message_stats', {}).get(item, 0)
             logging.debug("SENDER_DATA: - %s %s" % (key,value))
