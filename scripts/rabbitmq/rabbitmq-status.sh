@@ -19,6 +19,7 @@ if [[ -z "$NODE" ]]; then
 fi
 #rabbitmq[queues]
 #rabbitmq[server,disk_free]
+#rabbitmq[check_aliveness]
 
 # This assumes that the server is going to then use zabbix_sender to feed the data BACK to the server.  Right now, I'm doing that
 # in the python script

@@ -12,8 +12,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App RabbitMQ v2</template>
-            <name>Template App RabbitMQ v2</name>
+            <template>Template App RabbitMQ v3</template>
+            <name>Template App RabbitMQ v3</name>
             <groups>
                 <group>
                     <name>Rabbit Servers</name>
@@ -1001,7 +1001,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ v2:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].nodata(10m)}=1</expression>
+                            <expression>{Template App RabbitMQ v3:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].nodata(10m)}=1</expression>
                             <name>No data received on queue {#VHOSTNAME}/{#QUEUENAME} in 10 minutes.</name>
                             <url/>
                             <status>0</status>
@@ -1010,7 +1010,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ v2:rabbitmq.queues[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 and {Template App RabbitMQ v2:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}&lt;&gt;0</expression>
+                            <expression>{Template App RabbitMQ v3:rabbitmq.queues[{#VHOSTNAME},queue_consumers,{#QUEUENAME}].max(120)}=0 and {Template App RabbitMQ v3:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].max(120)}&lt;&gt;0</expression>
                             <name>No queue consumer found and messages present on: {#VHOSTNAME}/{#QUEUENAME}</name>
                             <url/>
                             <status>0</status>
@@ -1019,7 +1019,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ v2:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;200000</expression>
+                            <expression>{Template App RabbitMQ v3:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;200000</expression>
                             <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - CRITICAL</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
@@ -1028,7 +1028,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template App RabbitMQ v2:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;100000 and {Template App RabbitMQ v2:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;200000</expression>
+                            <expression>{Template App RabbitMQ v3:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&gt;100000 and {Template App RabbitMQ v3:rabbitmq.queues[{#VHOSTNAME},queue_messages,{#QUEUENAME}].last(0)}&lt;200000</expression>
                             <name>{#NODENAME}/{#VHOSTNAME}/{#QUEUENAME} - Warning</name>
                             <url>http://{#FQDN}:15672/#/queues/</url>
                             <status>0</status>
@@ -1064,7 +1064,7 @@
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template App RabbitMQ v2</host>
+                                        <host>Template App RabbitMQ v3</host>
                                         <key>rabbitmq[{#VHOSTNAME},queue_message_stats_deliver_get,{#QUEUENAME}]</key>
                                     </item>
                                 </graph_item>
@@ -1076,7 +1076,7 @@
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
-                                        <host>Template App RabbitMQ v2</host>
+                                        <host>Template App RabbitMQ v3</host>
                                         <key>rabbitmq[{#VHOSTNAME},queue_message_stats_publish,{#QUEUENAME}]</key>
                                     </item>
                                 </graph_item>
@@ -1093,8 +1093,8 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{RabbitMQ v2:rabbitmq[check_aliveness].str(ok)}=0</expression>
-            <name>Dead Rabbit on {HOSTNAME}</name>
+            <expression>{RabbitMQ v3:rabbitmq[check_aliveness].str(ok)}=0</expression>
+            <name>Dead Rabbit</name>
             <url/>
             <status>0</status>
             <priority>4</priority>
@@ -1103,8 +1103,8 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq.server.filedesc.percentused.last(0)}&gt;50</expression>
-            <name>Percent file descriptors greater than 50% on {HOSTNAME}</name>
+            <expression>{Template App RabbitMQ v3:rabbitmq.server.filedesc.percentused.last(0)}&gt;50</expression>
+            <name>Percent file descriptors greater than 50%</name>
             <url/>
             <status>0</status>
             <priority>2</priority>
@@ -1112,14 +1112,14 @@
             <type>0</type>
             <dependencies>
                 <dependency>
-                    <name>Percent file descriptors greater than 75% on {HOSTNAME}</name>
-                    <expression>{Template App RabbitMQ v2:rabbitmq.server.filedesc.percentused.last(0)}&gt;75</expression>
+                    <name>Percent file descriptors greater than 75%</name>
+                    <expression>{Template App RabbitMQ v3:rabbitmq.server.filedesc.percentused.last(0)}&gt;75</expression>
                 </dependency>
             </dependencies>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq.server.filedesc.percentused.last(0)}&gt;75</expression>
-            <name>Percent file descriptors greater than 75% on {HOSTNAME}</name>
+            <expression>{Template App RabbitMQ v3:rabbitmq.server.filedesc.percentused.last(0)}&gt;75</expression>
+            <name>Percent file descriptors greater than 75%</name>
             <url/>
             <status>0</status>
             <priority>4</priority>
@@ -1128,8 +1128,8 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq.server.mem.percentused.last(0)}&gt;50</expression>
-            <name>Percent memory use greater than 50% on {HOSTNAME}</name>
+            <expression>{Template App RabbitMQ v3:rabbitmq.server.mem.percentused.last(0)}&gt;50</expression>
+            <name>Percent memory use greater than 50%</name>
             <url/>
             <status>0</status>
             <priority>2</priority>
@@ -1137,14 +1137,14 @@
             <type>0</type>
             <dependencies>
                 <dependency>
-                    <name>Percent memory use greater than 75% on {HOSTNAME}</name>
-                    <expression>{RabbitMQ v2:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
+                    <name>Percent memory use greater than 75%</name>
+                    <expression>{RabbitMQ v3:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
                 </dependency>
             </dependencies>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
-            <name>Percent memory use greater than 75% on {HOSTNAME}</name>
+            <expression>{Template App RabbitMQ v3:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
+            <name>Percent memory use greater than 75%</name>
             <url/>
             <status>0</status>
             <priority>4</priority>
@@ -1153,8 +1153,8 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq.server.sockets.percentused.last(0)}&gt;50</expression>
-            <name>Percent sockets in use greater than 50% on {HOSTNAME}</name>
+            <expression>{Template App RabbitMQ v3:rabbitmq.server.sockets.percentused.last(0)}&gt;50</expression>
+            <name>Percent sockets in use greater than 50%</name>
             <url/>
             <status>0</status>
             <priority>2</priority>
@@ -1162,14 +1162,14 @@
             <type>0</type>
             <dependencies>
                 <dependency>
-                    <name>Percent sockets in use greater than 75% on {HOSTNAME}</name>
-                    <expression>{Template App RabbitMQ v2:rabbitmq.server.sockets.percentused.last(0)}&gt;75</expression>
+                    <name>Percent sockets in use greater than 75%</name>
+                    <expression>{Template App RabbitMQ v3:rabbitmq.server.sockets.percentused.last(0)}&gt;75</expression>
                 </dependency>
             </dependencies>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq.server.sockets.percentused.last(0)}&gt;75</expression>
-            <name>Percent sockets in use greater than 75% on {HOSTNAME}</name>
+            <expression>{Template App RabbitMQ v3:rabbitmq.server.sockets.percentused.last(0)}&gt;75</expression>
+            <name>Percent sockets in use greater than 75%</name>
             <url/>
             <status>0</status>
             <priority>4</priority>
@@ -1178,7 +1178,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq[queues].last()}&lt;&gt;0 or {Template App RabbitMQ v2:rabbitmq[queues].nodata(5m)}=1</expression>
+            <expression>{Template App RabbitMQ v3:rabbitmq[queues].last()}&lt;&gt;0 or {Template App RabbitMQ v3:rabbitmq[queues].nodata(5m)}=1</expression>
             <name>Queue data status issue</name>
             <url/>
             <status>0</status>
@@ -1187,13 +1187,13 @@
             <type>0</type>
             <dependencies>
                 <dependency>
-                    <name>Dead Rabbit on {HOSTNAME}</name>
-                    <expression>{Template App RabbitMQ v2:rabbitmq[check_aliveness].str(ok)}=0</expression>
+                    <name>Dead Rabbit</name>
+                    <expression>{Template App RabbitMQ v3:rabbitmq[check_aliveness].str(ok)}=0</expression>
                 </dependency>
             </dependencies>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq[server,partitions].regexp(\[\]|^\s*$)}=0</expression>
+            <expression>{Template App RabbitMQ v3:rabbitmq[server,partitions].regexp(\[\]|^\s*$)}=0</expression>
             <name>RabbitMQ Cluster partition detected</name>
             <url/>
             <status>0</status>
@@ -1203,7 +1203,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v2:rabbitmq[server,rabbitmq_version].diff(0)}&gt;0</expression>
+            <expression>{Template App RabbitMQ v3:rabbitmq[server,rabbitmq_version].diff(0)}&gt;0</expression>
             <name>RabbitMQ server version has changed</name>
             <url/>
             <status>0</status>
@@ -1240,7 +1240,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App RabbitMQ v2</host>
+                        <host>Template App RabbitMQ v3</host>
                         <key>rabbitmq[server,message_stats_deliver_get]</key>
                     </item>
                 </graph_item>
@@ -1252,7 +1252,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template App RabbitMQ v2</host>
+                        <host>Template App RabbitMQ v3</host>
                         <key>rabbitmq[server,message_stats_publish]</key>
                     </item>
                 </graph_item>
