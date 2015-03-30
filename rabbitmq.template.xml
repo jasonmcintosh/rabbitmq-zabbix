@@ -1065,7 +1065,7 @@
                                     <type>0</type>
                                     <item>
                                         <host>Template App RabbitMQ v3</host>
-                                        <key>rabbitmq[{#VHOSTNAME},queue_message_stats_deliver_get,{#QUEUENAME}]</key>
+                                        <key>rabbitmq.queues[{#VHOSTNAME},queue_message_stats_deliver_get,{#QUEUENAME}]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -1077,7 +1077,7 @@
                                     <type>0</type>
                                     <item>
                                         <host>Template App RabbitMQ v3</host>
-                                        <key>rabbitmq[{#VHOSTNAME},queue_message_stats_publish,{#QUEUENAME}]</key>
+                                        <key>rabbitmq.queues[{#VHOSTNAME},queue_message_stats_publish,{#QUEUENAME}]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -1093,7 +1093,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{RabbitMQ v3:rabbitmq[check_aliveness].str(ok)}=0</expression>
+            <expression>{Template App RabbitMQ v3:rabbitmq[check_aliveness].str(ok)}=0</expression>
             <name>Dead Rabbit</name>
             <url/>
             <status>0</status>
@@ -1138,7 +1138,7 @@
             <dependencies>
                 <dependency>
                     <name>Percent memory use greater than 75%</name>
-                    <expression>{RabbitMQ v3:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
+                    <expression>{Template App RabbitMQ v3:rabbitmq.server.mem.percentused.last(0)}&gt;75</expression>
                 </dependency>
             </dependencies>
         </trigger>
