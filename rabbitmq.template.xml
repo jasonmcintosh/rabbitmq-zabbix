@@ -1178,7 +1178,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template App RabbitMQ v3:rabbitmq[queues].last()}&lt;&gt;0 or {Template App RabbitMQ v3:rabbitmq[queues].nodata(5m)}=1</expression>
+            <expression>{Template App RabbitMQ v3:rabbitmq[queues].last(0)}&lt;&gt;0 or {Template App RabbitMQ v3:rabbitmq[queues].nodata(5m)}=1</expression>
             <name>Queue data status issue</name>
             <url/>
             <status>0</status>
