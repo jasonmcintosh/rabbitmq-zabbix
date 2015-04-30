@@ -44,6 +44,10 @@ To only use the durable queues for a given vhost, the filter would be:
 To supply a list of queue names, the filter would be:
 `FILTER='[{"name": "mytestqueuename"}, {"name": "queue2"}]'`
 
+## Low level discovery of queues, including GLOBAL REGULAR EXPRESSIONS:
+`https://www.zabbix.com/documentation/3.0/manual/regular_expressions`
+The low level discovery, which is what determines what queues to be monitored, requires with the existing template that a filter be defined as a global regular expression.  You can modify the template to do it in other ways, e.g. with a host level macro (NOT TESTED), or override it per host.  Or any number of methods.  But without a filter, NO queues will be discovered, JUST server level items will show up, and your checks will fail.
+
 At some point the filters may be improved to include regular expressions or "ignore these queues"
 
 ## CHANGES
