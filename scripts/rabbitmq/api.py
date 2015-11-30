@@ -24,7 +24,7 @@ class RabbitMQAPI(object):
         self.host_name = host_name or socket.gethostname()
         self.port = port
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
-        self.senderhostname = senderhostname
+        self.senderhostname = senderhostname if senderhostname else host_name
 
     def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
