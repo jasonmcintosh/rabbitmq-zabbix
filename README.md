@@ -22,7 +22,7 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 
 
 ## CONFIGURATION:
-You may optionally create a .rab.auth file in the scripts/ directory. This file allows you to change default parameters. The format is `VARIABLE=value`, one per line:
+You may optionally create a `.rab.auth` file in the `scripts/rabbitmq` directory. This file allows you to change default parameters. The format is `VARIABLE=value`, one per line:
 The default values are as follows:
 
     USERNAME=guest
