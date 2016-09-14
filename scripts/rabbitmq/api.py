@@ -12,24 +12,23 @@ import tempfile
 import os
 import logging
 
-logging.basicConfig(filename='/var/log/zabbix/rabbitmq_zabbix.log', level=logging.WARNING, format='%(asctime)s %(levelname)s: %(message)s')
+logging.basicConfig(filename='/var/log/zabbix/rabbitmq_zabbix.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
 
     def __init__(self, user_name='guest', password='guest', host_name='',
-                 protocol='http', port=15672, conf='/etc/zabbix/zabbix_agentd.conf', senderhostname=None):
+                 port=15672, conf='/etc/zabbix/zabbix_agentd.conf', senderhostname=None):
         self.user_name = user_name
         self.password = password
         self.host_name = host_name or socket.gethostname()
-        self.protocol = protocol
         self.port = port
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
-        self.senderhostname = senderhostname if senderhostname else host_name
+        self.senderhostname = senderhostname
 
     def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
-        url = '{0}://{1}:{2}/api/{3}'.format(self.protocol, self.host_name, self.port, path)
+        url = 'http://{0}:{1}/api/{2}'.format(self.host_name, self.port, path)
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, self.user_name, self.password)
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
@@ -56,6 +55,27 @@ class RabbitMQAPI(object):
                     logging.debug('Discovered queue '+queue['vhost']+'/'+queue['name'])
                     break
         return queues
+
+    def list_shovels(self, filters=None):
+        '''
+        List all of the RabbitMQ shovels, filtered against the filters provided
+        in .rab.auth. See README.md for more information.
+        '''
+        shovels = []
+        if not filters:
+            filters = [{}]
+        for shovel in self.call_api('shovels'):
+            logging.debug("Discovered shovel " + shovel['name'] + ", checking to see if it's filtered...")
+            for _filter in filters:
+                check = [(x, y) for x, y in shovel.items() if x in _filter]
+                shared_items = set(_filter.items()).intersection(check)
+                if len(shared_items) == len(_filter):
+                    element = {'{#VHOSTNAME}': shovel['vhost'],
+                               '{#SHOVELNAME}': shovel['name']}
+                    shovels.append(element)
+                    logging.debug('Discovered shovel '+shovel['vhost']+'/'+shovel['name'])
+                    break
+        return shovels
 
     def list_nodes(self):
         '''Lists all rabbitMQ nodes in the cluster'''
@@ -95,6 +115,36 @@ class RabbitMQAPI(object):
         os.unlink(rdatafile.name)
         return return_code
 
+    def check_shovel(self, filters=None):
+        '''Return the value for a specific item in a shovel's details.'''
+        return_code = 0
+        if not filters:
+            filters = [{}]
+
+        rdatafile = tempfile.NamedTemporaryFile(delete=False)
+
+        for shovel in self.call_api('shovels'):
+            success = False
+            logging.debug("Filtering out by " + str(filters))
+            for _filter in filters:
+                check = [(x, y) for x, y in shovel.items() if x in _filter]
+                shared_items = set(_filter.items()).intersection(check)
+                if len(shared_items) == len(_filter):
+                    success = True
+                    break
+            if success:
+                key = '"rabbitmq.shovels[{0},shovel_{1},{2}]"'
+                key = key.format(shovel['vhost'], 'state', shovel['name'])
+                value = shovel.get('state', 0)
+                logging.debug("SENDER_DATA: - %s %s" % (key,value))
+                rdatafile.write("- %s %s\n" % (key, value))
+
+
+        rdatafile.close()
+        return_code = self._send_data(rdatafile)
+        os.unlink(rdatafile.name)
+        return return_code
+
     def _prepare_data(self, queue, tmpfile):
         '''Prepare the queue data for sending'''
         for item in ['memory', 'messages', 'messages_unacknowledged',
@@ -111,6 +161,7 @@ class RabbitMQAPI(object):
             value = queue.get('message_stats', {}).get(item, 0)
             logging.debug("SENDER_DATA: - %s %s" % (key,value))
             tmpfile.write("- %s %s\n" % (key, value))
+			
 
     def _send_data(self, tmpfile):
         '''Send the queue data to Zabbix.'''
@@ -155,7 +206,7 @@ class RabbitMQAPI(object):
 
 def main():
     '''Command-line parameters and decoding for Zabbix use/consumption.'''
-    choices = ['list_queues', 'list_nodes', 'queues', 'check_aliveness',
+    choices = ['list_queues', 'list_shovels', 'list_nodes', 'queues', 'shovels', 'check_aliveness',
                'server']
     parser = optparse.OptionParser()
     parser.add_option('--username', help='RabbitMQ API username',
@@ -164,8 +215,6 @@ def main():
                       default='guest')
     parser.add_option('--hostname', help='RabbitMQ API host',
                       default=socket.gethostname())
-    parser.add_option('--protocol', help='RabbitMQ API protocol (http or https)',
-                      default='http')
     parser.add_option('--port', help='RabbitMQ API port', type='int',
                       default=15672)
     parser.add_option('--check', type='choice', choices=choices,
@@ -180,7 +229,7 @@ def main():
         parser.error('At least one check should be specified')
     logging.debug("Started trying to process data")
     api = RabbitMQAPI(user_name=options.username, password=options.password,
-                      host_name=options.hostname, protocol=options.protocol, port=options.port,
+                      host_name=options.hostname, port=options.port,
                       conf=options.conf, senderhostname=options.senderhostname)
     if options.filters:
         try:
@@ -195,8 +244,12 @@ def main():
         print json.dumps({'data': api.list_queues(filters)})
     elif options.check == 'list_nodes':
         print json.dumps({'data': api.list_nodes()})
+    elif options.check == 'list_shovels':
+        print json.dumps({'data': api.list_shovels()})
     elif options.check == 'queues':
         print api.check_queue(filters)
+    elif options.check == 'shovels':
+        print api.check_shovel(filters)
     elif options.check == 'check_aliveness':
         print api.check_aliveness()
     elif options.check == 'server':
