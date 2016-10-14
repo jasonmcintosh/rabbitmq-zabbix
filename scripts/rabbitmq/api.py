@@ -12,7 +12,6 @@ import tempfile
 import os
 import logging
 
-logging.basicConfig(filename='/var/log/zabbix/rabbitmq_zabbix.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
@@ -32,7 +31,7 @@ class RabbitMQAPI(object):
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, self.user_name, self.password)
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-        logging.debug('Issue a rabbit API call to get data on ' + path)
+        logging.debug('Issue a rabbit API call to get data on ' + path + " against " + self.host_name)
         return json.loads(urllib2.build_opener(handler).open(url).read())
 
     def list_queues(self, filters=None):
@@ -64,18 +63,24 @@ class RabbitMQAPI(object):
         shovels = []
         if not filters:
             filters = [{}]
-        for shovel in self.call_api('shovels'):
-            logging.debug("Discovered shovel " + shovel['name'] + ", checking to see if it's filtered...")
-            for _filter in filters:
-                check = [(x, y) for x, y in shovel.items() if x in _filter]
-                shared_items = set(_filter.items()).intersection(check)
-                if len(shared_items) == len(_filter):
-                    element = {'{#VHOSTNAME}': shovel['vhost'],
-                               '{#SHOVELNAME}': shovel['name']}
-                    shovels.append(element)
-                    logging.debug('Discovered shovel '+shovel['vhost']+'/'+shovel['name'])
-                    break
-        return shovels
+        try:
+            for shovel in self.call_api('shovels'):
+                logging.debug("Discovered shovel " + shovel['name'] + ", checking to see if it's filtered...")
+                for _filter in filters:
+                    check = [(x, y) for x, y in shovel.items() if x in _filter]
+                    shared_items = set(_filter.items()).intersection(check)
+                    if len(shared_items) == len(_filter):
+                        element = {'{#VHOSTNAME}': shovel['vhost'],
+                                   '{#SHOVELNAME}': shovel['name']}
+                        shovels.append(element)
+                        logging.debug('Discovered shovel '+shovel['vhost']+'/'+shovel['name'])
+                        break
+            return shovels
+        except urllib2.HTTPError as err:
+            if err.code == 404:
+                return shovels
+            else:
+                raise err
 
     def list_nodes(self):
         '''Lists all rabbitMQ nodes in the cluster'''
@@ -165,7 +170,7 @@ class RabbitMQAPI(object):
 
     def _send_data(self, tmpfile):
         '''Send the queue data to Zabbix.'''
-        args = 'zabbix_sender -c {0} -i {1}'
+        args = 'zabbix_sender -vv -c {0} -i {1}'
         if self.senderhostname:
             args = args + " -s " + self.senderhostname
         return_code = 0
@@ -176,9 +181,9 @@ class RabbitMQAPI(object):
         logging.debug("Finished sending data")
         return_code = process.wait()
         logging.info("Found return code of " + str(return_code))
-        if return_code != 0:
-            logging.warning(out)
-            logging.warning(err)
+        if return_code == 1:
+            logging.error(out)
+            logging.error(err)
         else:
             logging.debug(err)
             logging.debug(out)
@@ -198,8 +203,11 @@ class RabbitMQAPI(object):
           return self.call_api('overview').get('rabbitmq_version', 'None')
         '''Return the value for a specific item in a node's details.'''
         node_name = node_name.split('.')[0]
-        for nodeData in self.call_api('nodes'):
-            if node_name in nodeData['name']:
+        nodeInfo = self.call_api('nodes')
+        for nodeData in nodeInfo:
+            logging.debug("Checking to see if node name {0} is in {1} for item {2} found {3} nodes".format(node_name, nodeData['name'], item, len(nodeInfo)))
+            if node_name in nodeData['name'] or len(nodeInfo) == 1:
+                logging.debug("Got data from node {0} of {1} ".format(node_name, nodeData.get(item)))
                 return nodeData.get(item)
         return 'Not Found'
 
@@ -224,9 +232,13 @@ def main():
     parser.add_option('--node', help='Which node to check (valid for --check=server)')
     parser.add_option('--conf', default='/etc/zabbix/zabbix_agentd.conf')
     parser.add_option('--senderhostname', default='', help='Allows including a sender parameter on calls to zabbix_sender')
+    parser.add_option('--logfile', help='File to log errors (defaults to /var/log/zabbix/rabbitmq_zabbix.log)', default='/var/log/zabbix/rabbitmq_zabbix.log')
+    parser.add_option('--loglevel', help='Defaults to INFO', default='INFO')
     (options, args) = parser.parse_args()
     if not options.check:
         parser.error('At least one check should be specified')
+    logging.basicConfig(filename=options.logfile or "/var/log/zabbix/rabbitmq_zabbix.log", level=logging.getLevelName(options.loglevel or "INFO"), format='%(asctime)s %(levelname)s: %(message)s')
+
     logging.debug("Started trying to process data")
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
