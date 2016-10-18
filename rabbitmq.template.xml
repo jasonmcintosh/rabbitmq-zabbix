@@ -770,7 +770,7 @@
                     <type>7</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>rabbitmq.discovery_queue</key>
+                    <key>rabbitmq.discovery_queues</key>
                     <delay>360</delay>
                     <status>0</status>
                     <allowed_hosts/>
