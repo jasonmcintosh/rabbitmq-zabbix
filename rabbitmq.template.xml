@@ -1181,7 +1181,7 @@
                         <conditions>
                             <condition>
                                 <macro>{#VHOSTNAME}</macro>
-                                <value>@rabbitmq vhosts for discovery</value>
+                                <value></value>
                                 <operator>8</operator>
                                 <formulaid>A</formulaid>
                             </condition>
