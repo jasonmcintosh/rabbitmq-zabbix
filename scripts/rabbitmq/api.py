@@ -17,17 +17,18 @@ class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
 
     def __init__(self, user_name='guest', password='guest', host_name='',
-                 port=15672, conf='/etc/zabbix/zabbix_agentd.conf', senderhostname=None):
+                 port=15672, conf='/etc/zabbix/zabbix_agentd.conf', senderhostname=None, protocol='http'):
         self.user_name = user_name
         self.password = password
         self.host_name = host_name or socket.gethostname()
         self.port = port
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
         self.senderhostname = senderhostname
+        self.protocol = protocol
 
     def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
-        url = 'http://{0}:{1}/api/{2}'.format(self.host_name, self.port, path)
+        url = '{0}://{1}:{2}/api/{3}'.format(self.protocol, self.host_name, self.port, path)
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, self.user_name, self.password)
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
@@ -217,16 +218,12 @@ def main():
     choices = ['list_queues', 'list_shovels', 'list_nodes', 'queues', 'shovels', 'check_aliveness',
                'server']
     parser = optparse.OptionParser()
-    parser.add_option('--username', help='RabbitMQ API username',
-                      default='guest')
-    parser.add_option('--password', help='RabbitMQ API password',
-                      default='guest')
-    parser.add_option('--hostname', help='RabbitMQ API host',
-                      default=socket.gethostname())
-    parser.add_option('--port', help='RabbitMQ API port', type='int',
-                      default=15672)
-    parser.add_option('--check', type='choice', choices=choices,
-                      help='Type of check')
+    parser.add_option('--username', help='RabbitMQ API username', default='guest')
+    parser.add_option('--password', help='RabbitMQ API password', default='guest')
+    parser.add_option('--hostname', help='RabbitMQ API host', default=socket.gethostname())
+    parser.add_option('--protocol', help='Use http or https', default='http')
+    parser.add_option('--port', help='RabbitMQ API port', type='int', default=15672)
+    parser.add_option('--check', type='choice', choices=choices, help='Type of check')
     parser.add_option('--metric', help='Which metric to evaluate', default='')
     parser.add_option('--filters', help='Filter used queues (see README)')
     parser.add_option('--node', help='Which node to check (valid for --check=server)')
