@@ -48,7 +48,8 @@ class RabbitMQAPI(object):
                 check = [(x, y) for x, y in queue.items() if x in _filter]
                 shared_items = set(_filter.items()).intersection(check)
                 if len(shared_items) == len(_filter):
-                    element = {'{#VHOSTNAME}': queue['vhost'],
+                    element = {'{#NODENAME}': queue['node'],
+                               '{#VHOSTNAME}': queue['vhost'],
                                '{#QUEUENAME}': queue['name']}
                     queues.append(element)
                     logging.debug('Discovered queue '+queue['vhost']+'/'+queue['name'])
