@@ -4,3 +4,4 @@
 *~
 *.swp
 *.log
+.cache
