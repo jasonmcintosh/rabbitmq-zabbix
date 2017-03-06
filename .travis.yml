@@ -5,8 +5,9 @@ python:
   - "2.7"
 
 before_install: ./tests/setup_auth.sh
+
 script:
-  - pytest
+  - py.test
   - ./scripts/rabbitmq/list_rabbit_queues.sh
   - ./scripts/rabbitmq/list_rabbit_nodes.sh
   - ./scripts/rabbitmq/list_rabbit_shovels.sh
