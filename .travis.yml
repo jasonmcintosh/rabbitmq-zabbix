@@ -1,0 +1,21 @@
+language: python
+services:
+  - rabbitmq
+python:
+  - "2.7"
+
+before_install: ./tests/setup_auth.sh
+
+script:
+  - py.test
+  - ./scripts/rabbitmq/list_rabbit_queues.sh
+  - ./scripts/rabbitmq/list_rabbit_nodes.sh
+  - ./scripts/rabbitmq/list_rabbit_shovels.sh
+  - ./scripts/rabbitmq/rabbitmq-status.sh server message_stats_deliver_get
+  - ./scripts/rabbitmq/rabbitmq-status.sh check_aliveness
+notifications:
+  email:
+    recipients:
+      - mcintoshj@gmail.com
+    on_failure: always
+    on_success: change
