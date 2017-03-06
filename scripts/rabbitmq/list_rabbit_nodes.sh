@@ -12,4 +12,4 @@ if [[ -z "$NODE" ]]; then
     NODE=`hostname`
 fi
 
-./api.py --username=$USERNAME --password=$PASSWORD --check=list_nodes --filter="$FILTER" --conf=$CONF --hostname=$HOSTNAME --node="$NODE" --loglevel=${LOGLEVEL} --logfile=${LOGFILE}
+./api.py --username=$USERNAME --password=$PASSWORD --check=list_nodes --filter="$FILTER" --conf=$CONF --hostname=$HOSTNAME --node="$NODE" --loglevel=${LOGLEVEL} --logfile=${LOGFILE} --port=$PORT --protocol=$PROTOCOL

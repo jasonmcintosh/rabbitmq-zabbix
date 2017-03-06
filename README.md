@@ -37,6 +37,8 @@ The default values are as follows:
     USERNAME=guest
     PASSWORD=guest
     CONF=/etc/zabbix/zabbix_agent.conf
+    LOGLEVEL=INFO
+    LOGFILE=/var/log/zabbix/rabbitmq_zabbix.log
 
 You can also add a filter in this file to restrict which queues are monitored.
 This item is a JSON-encoded string. The format provides some flexibility for
@@ -52,6 +54,8 @@ To only use the durable queues for a given vhost, the filter would be:
 
 To supply a list of queue names, the filter would be:
 `FILTER='[{"name": "mytestqueuename"}, {"name": "queue2"}]'`
+
+To debug any potential issues, make sure the log directory exists and can be written to by zabbix, then set LOGLEVEL=DEBUG in the .rab.auth file and you'll get quite verbose output
 
 ## Low level discovery of queues, including GLOBAL REGULAR EXPRESSIONS:
 `https://www.zabbix.com/documentation/3.0/manual/regular_expressions`
