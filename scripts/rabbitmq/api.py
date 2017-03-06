@@ -96,6 +96,25 @@ class RabbitMQAPI(object):
             logging.debug('Discovered nodes '+name+'/'+node['type'])
         return nodes
 
+    def list_exchanges(self, filters=None):
+        '''
+        List all of the RabbitMQ exchanges, filtered against the filters provided in .rab.auth.
+        '''
+        exchanges = []
+        if not filters:
+            filters = [{}]
+        for exchange in self.call_api('exchanges'):
+            logging.debug('Discovered exchange "%s", checking to see if it\'s filtered...' % exchange['name'])
+            for _filter in filters:
+                check = [(x, y) for x, y in exchange.items() if x in _filter]
+                shared_items = set(_filter.items()).intersection(check)
+                if len(shared_items) != len(_filter):
+                    break
+                exchanges.append({'{#VHOSTNAME}': exchange['vhost'],
+                                  '{#EXCHANGENAME}': exchange['name']})
+                logging.debug('Discovered exchange "%s/%s"' % (exchange['vhost'], exchange['name']))
+        return exchanges
+
     def check_queue(self, filters=None):
         '''Return the value for a specific item in a queue's details.'''
         return_code = 0
@@ -215,7 +234,8 @@ class RabbitMQAPI(object):
 
 def main():
     '''Command-line parameters and decoding for Zabbix use/consumption.'''
-    choices = ['list_queues', 'list_shovels', 'list_nodes', 'queues', 'shovels', 'check_aliveness',
+    choices = ['list_queues', 'list_shovels', 'list_nodes', 'list_exchanges',
+               'queues', 'shovels', 'check_aliveness',
                'server']
     parser = optparse.OptionParser()
     parser.add_option('--username', help='RabbitMQ API username',
@@ -255,6 +275,8 @@ def main():
         filters = [filters]
     if options.check == 'list_queues':
         print json.dumps({'data': api.list_queues(filters)})
+    elif options.check == 'list_exchanges':
+        print json.dumps({'data': api.list_exchanges(filters)})
     elif options.check == 'list_nodes':
         print json.dumps({'data': api.list_nodes()})
     elif options.check == 'list_shovels':
