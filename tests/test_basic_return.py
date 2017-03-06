@@ -28,8 +28,6 @@ def test_queue_check(capsys, monkeypatch):
     with pytest.raises(Exception):
         main()
     out, err = capsys.readouterr()
-    with capsys.disabled():
-        print(err)
     assert "Started trying to process data" in debugoutput
     assert "Issue a rabbit" in debugoutput
 
