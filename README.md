@@ -22,7 +22,16 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 
 
 ## CONFIGURATION:
-You may optionally create a `.rab.auth` file in the `scripts/rabbitmq` directory. This file allows you to change default parameters. The format is `VARIABLE=value`, one per line:
+**Basic security recommendation**
+```
+When setting up a monitoring system, a general rule is that you should not to use guest.
+Guest is an admin account with full permissions.  A basic suggestion is to setup a read 
+only account who can access the management API.  Make sure that account is READ ONLY
+IF using guest a warning - it can only access RabbitMQ management via localhost so you will 
+need to set HOSTNAME=localhost
+```
+
+You should create a `.rab.auth` file in the `scripts/rabbitmq` directory. This file allows you to change default parameters. The format is `VARIABLE=value`, one per line:
 The default values are as follows:
 
     USERNAME=guest
