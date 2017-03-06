@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "Setting up rabbit auth file"
 
 cat<<EOF>scripts/rabbitmq/.rab.auth
 USERNAME=guest
