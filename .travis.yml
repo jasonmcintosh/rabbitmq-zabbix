@@ -11,6 +11,7 @@ script:
   - ./scripts/rabbitmq/list_rabbit_nodes.sh
   - ./scripts/rabbitmq/list_rabbit_shovels.sh
   - ./scripts/rabbitmq/rabbitmq-status.sh server message_stats_deliver_get
+  - ./scripts/rabbitmq/rabbitmq-status.sh check_aliveness
 notifications:
   email:
     recipients:
