@@ -27,7 +27,9 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 ```
 When setting up a monitoring system, a general rule is that you should not to use guest.
 Guest is an admin account with full permissions.  A basic suggestion is to setup a read 
-only account who can access the management API.  Make sure that account is READ ONLY
+only account who can access the management API.  Make sure that account is READ ONLY.  With 
+one caveat - the monitoring user should be able execute the aliveness-test api.  That might mean
+needing a slightly different set of permissions or pre-creation of the aliveness check queues.
 IF using guest a warning - it can only access RabbitMQ management via localhost so you will 
 need to set HOSTNAME=localhost
 ```
