@@ -24,7 +24,7 @@ class RabbitMQAPI(object):
         self.port = port
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
         self.senderhostname = senderhostname
-        self.protocol = protocol
+        self.protocol = protocol or 'http'
 
     def call_api(self, path):
         '''Call the REST API and convert the results into JSON.'''
@@ -240,7 +240,8 @@ def main():
     logging.debug("Started trying to process data")
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
-                      conf=options.conf, senderhostname=options.senderhostname)
+                      conf=options.conf, senderhostname=options.senderhostname, 
+		     protocol=options.protocol)
     if options.filters:
         try:
             filters = json.loads(options.filters)
