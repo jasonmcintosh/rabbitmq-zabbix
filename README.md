@@ -60,6 +60,13 @@ To supply a list of queue names, the filter would be:
 
 To debug any potential issues, make sure the log directory exists and can be written to by zabbix, then set LOGLEVEL=DEBUG in the .rab.auth file and you'll get quite verbose output
 
+### Macros
+
+You can adjust the values for the critical and warning levels for the amount of messages by changing the following macros:
+
+- RABBIT_QUEUE_MESSAGES_CRIT Defines the critical value for the amount of messages in a queue. It is set to 200000 messages per default
+- RABBIT_QUEUE_MESSAGES_WARN Defines the warning value for the amount of messages in a queue. It is set to 100000 messages per default
+
 ## Low level discovery of queues, including GLOBAL REGULAR EXPRESSIONS:
 `https://www.zabbix.com/documentation/3.0/manual/regular_expressions`
 The low level discovery, which is what determines what queues to be monitored, requires with the existing template that a filter be defined as a global regular expression.  You can modify the template to do it in other ways, e.g. with a host level macro (NOT TESTED), or override it per host.  Or any number of methods.  But without a filter, NO queues will be discovered, JUST server level items will show up, and your checks will fail.
