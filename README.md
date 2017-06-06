@@ -42,6 +42,7 @@ The default values are as follows:
     CONF=/etc/zabbix/zabbix_agent.conf
     LOGLEVEL=INFO
     LOGFILE=/var/log/zabbix/rabbitmq_zabbix.log
+    PORT=15672
 
 You can also add a filter in this file to restrict which queues are monitored.
 This item is a JSON-encoded string. The format provides some flexibility for
