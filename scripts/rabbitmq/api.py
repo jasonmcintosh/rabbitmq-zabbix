@@ -163,7 +163,7 @@ class RabbitMQAPI(object):
             logging.debug("SENDER_DATA: - %s %s" % (key,value))
             tmpfile.write("- %s %s\n" % (key, value))
         ##  This is a non standard bit of information added after the standard items
-        for item in ['deliver_get', 'publish']:
+        for item in ['deliver_get', 'publish', 'ack']:
             key = '"rabbitmq.queues[{0},queue_message_stats_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get('message_stats', {}).get(item, 0)
@@ -202,6 +202,8 @@ class RabbitMQAPI(object):
           return self.call_api('overview').get('message_stats', {}).get('deliver_get_details', {}).get('rate',0)
         elif item == 'message_stats_publish':
           return self.call_api('overview').get('message_stats', {}).get('publish_details', {}).get('rate',0)
+        elif item == 'message_stats_ack':
+          return self.call_api('overview').get('message_stats', {}).get('ack_details', {}).get('rate',0)
         elif item == 'message_count_total':
           return self.call_api('overview').get('queue_totals', {}).get('messages',0)
         elif item == 'message_count_ready':
