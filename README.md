@@ -23,15 +23,23 @@ Set of python scripts, zabbix template, and associated data to do autodiscovery
 
 
 ## CONFIGURATION:
-**Basic security recommendation**
+**Basic security recommendation** See https://www.rabbitmq.com/access-control.html for more information on access control.
 ```
-When setting up a monitoring system, a general rule is that you should not to use guest.
-Guest is an admin account with full permissions.  A basic suggestion is to setup a read 
-only account who can access the management API.  Make sure that account is READ ONLY.  With 
+When setting up a monitoring system, a general rule is that you should not to use tbe built-in
+guest account.  Guest is an admin account with full permissions.  A basic suggestion is to setup 
+a read only account who can access the management API.  Make sure that account is READ ONLY.  With 
 one caveat - the monitoring user should be able execute the aliveness-test api.  That might mean
 needing a slightly different set of permissions or pre-creation of the aliveness check queues.
 IF using guest a warning - it can only access RabbitMQ management via localhost so you will 
 need to set HOSTNAME=localhost
+
+Below are sample commands to add a monitoring user with the required permissions.  Use these
+at your own risk or as a starting point - NOT a finishing point!  
+
+rabbitmqctl add_user zabbix pass
+rabbitmqctl set_user_tags zabbix management
+rabbitmqctl set_permissions -p / zabbix '^aliveness-test$' '^amq\.default$' '^aliveness-test$'
+
 ```
 
 You should create a `.rab.auth` file in the `scripts/rabbitmq` directory. This file allows you to change default parameters. The format is `VARIABLE=value`, one per line:
