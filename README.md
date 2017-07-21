@@ -37,7 +37,7 @@ Below are sample commands to add a monitoring user with the required permissions
 at your own risk or as a starting point - NOT a finishing point!  
 
 rabbitmqctl add_user zabbix pass
-rabbitmqctl set_user_tags zabbix management
+rabbitmqctl set_user_tags zabbix monitoring
 rabbitmqctl set_permissions -p / zabbix '^aliveness-test$' '^amq\.default$' '^aliveness-test$'
 
 ```
