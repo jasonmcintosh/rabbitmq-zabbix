@@ -16,12 +16,13 @@ import logging
 class RabbitMQAPI(object):
     '''Class for RabbitMQ Management API'''
 
-    def __init__(self, user_name='guest', password='guest', host_name='',
+    def __init__(self, user_name='guest', password='guest', host_name='', vhost_name='',
                  port=15672, conf='/etc/zabbix/zabbix_agentd.conf', senderhostname=None, protocol='http'):
         self.user_name = user_name
         self.password = password
         self.host_name = host_name or socket.gethostname()
         self.port = port
+	self.vhost_name = vhost_name or 'root'
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
         self.senderhostname = senderhostname
         self.protocol = protocol or 'http'
@@ -194,7 +195,7 @@ class RabbitMQAPI(object):
 
     def check_aliveness(self):
         '''Check the aliveness status of a given vhost.'''
-        return self.call_api('aliveness-test/%2f')['status']
+        return self.call_api('aliveness-test/'+self.vhost_name)['status']
 
     def check_server(self, item, node_name):
         '''First, check the overview specific items'''
@@ -233,6 +234,7 @@ def main():
     parser.add_option('--hostname', help='RabbitMQ API host', default=socket.gethostname())
     parser.add_option('--protocol', help='Use http or https', default='http')
     parser.add_option('--port', help='RabbitMQ API port', type='int', default=15672)
+    parser.add_option('--vhost', help='RabbitMQ vhost', default='root')
     parser.add_option('--check', type='choice', choices=choices, help='Type of check')
     parser.add_option('--metric', help='Which metric to evaluate', default='')
     parser.add_option('--filters', help='Filter used queues (see README)')
@@ -248,7 +250,7 @@ def main():
 
     logging.debug("Started trying to process data")
     api = RabbitMQAPI(user_name=options.username, password=options.password,
-                      host_name=options.hostname, port=options.port,
+                      host_name=options.hostname, port=options.port, vhost_name=options.vhost,
                       conf=options.conf, senderhostname=options.senderhostname, 
 		     protocol=options.protocol)
     if options.filters:
