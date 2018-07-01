@@ -106,17 +106,25 @@ class RabbitMQAPI(object):
 
         rdatafile = tempfile.NamedTemporaryFile(delete=False)
 
-        for queue in self.call_api('queues'):
-            success = False
-            logging.debug("Filtering out by " + str(filters))
-            for _filter in filters:
-                check = [(x, y) for x, y in queue.items() if x in _filter]
-                shared_items = set(_filter.items()).intersection(check)
-                if len(shared_items) == len(_filter):
-                    success = True
-                    break
-            if success:
-                self._prepare_data(queue, rdatafile)
+        try:
+            for queue in self.call_api('queues'):
+                success = False
+                logging.debug("Filtering out by " + str(filters))
+                for _filter in filters:
+                    check = [(x, y) for x, y in queue.items() if x in _filter]
+                    shared_items = set(_filter.items()).intersection(check)
+                    if len(shared_items) == len(_filter):
+                        success = True
+                        break
+                if success:
+                    self._prepare_data(queue, rdatafile)
+        except urllib2.HTTPError as err:
+            if err.code == 404:
+                rdatafile.close()
+                os.unlink(rdatafile.name)
+                return return_code
+            else:
+                raise err
 
         rdatafile.close()
         return_code = self._send_data(rdatafile)
@@ -131,22 +139,29 @@ class RabbitMQAPI(object):
 
         rdatafile = tempfile.NamedTemporaryFile(delete=False)
 
-        for shovel in self.call_api('shovels'):
-            success = False
-            logging.debug("Filtering out by " + str(filters))
-            for _filter in filters:
-                check = [(x, y) for x, y in shovel.items() if x in _filter]
-                shared_items = set(_filter.items()).intersection(check)
-                if len(shared_items) == len(_filter):
-                    success = True
-                    break
-            if success:
-                key = '"rabbitmq.shovels[{0},shovel_{1},{2}]"'
-                key = key.format(shovel['vhost'], 'state', shovel['name'])
-                value = shovel.get('state', 0)
-                logging.debug("SENDER_DATA: - %s %s" % (key,value))
-                rdatafile.write("- %s %s\n" % (key, value))
-
+        try:
+            for shovel in self.call_api('shovels'):
+                success = False
+                logging.debug("Filtering out by " + str(filters))
+                for _filter in filters:
+                    check = [(x, y) for x, y in shovel.items() if x in _filter]
+                    shared_items = set(_filter.items()).intersection(check)
+                    if len(shared_items) == len(_filter):
+                        success = True
+                        break
+                if success:
+                    key = '"rabbitmq.shovels[{0},shovel_{1},{2}]"'
+                    key = key.format(shovel['vhost'], 'state', shovel['name'])
+                    value = shovel.get('state', 0)
+                    logging.debug("SENDER_DATA: - %s %s" % (key,value))
+                    rdatafile.write("- %s %s\n" % (key, value))
+        except urllib2.HTTPError as err:
+            if err.code == 404:
+                rdatafile.close()
+                os.unlink(rdatafile.name)
+                return return_code
+            else:
+                raise err
 
         rdatafile.close()
         return_code = self._send_data(rdatafile)
