@@ -33,7 +33,7 @@ class RabbitMQAPI(object):
         password_mgr.add_password(None, url, self.user_name, self.password)
         handler = urllib2.HTTPBasicAuthHandler(password_mgr)
         logging.debug('Issue a rabbit API call to get data on ' + path + " against " + self.host_name)
-	logging.debug('Full URL:' + url)
+        logging.debug('Full URL:' + url)
         return json.loads(urllib2.build_opener(handler).open(url).read())
 
     def list_queues(self, filters=None):
