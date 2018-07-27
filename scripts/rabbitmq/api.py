@@ -23,7 +23,7 @@ class RabbitMQAPI(object):
         self.host_name = host_name or socket.gethostname()
         self.port = port
         self.conf = conf or '/etc/zabbix/zabbix_agentd.conf'
-        self.senderhostname = senderhostname
+        self.senderhostname = senderhostname or socket.gethostname()
         self.protocol = protocol or 'http'
 
     def call_api(self, path):
