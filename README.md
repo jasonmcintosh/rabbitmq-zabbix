@@ -1,5 +1,8 @@
 rabbitmq-zabbix
 =======================
+
+<note>Project is somewhat in maintenance mode.  I'm looking at moving from Zabbix to Prometheus, and there are other alternatives for that which seem seem solid.  Sorry for the lack of updates, will maintain this as best I can but I don't do much with zabbix anymore </note>
+
 [![Build Status](https://travis-ci.org/jasonmcintosh/rabbitmq-zabbix.svg?branch=master)](https://travis-ci.org/jasonmcintosh/rabbitmq-zabbix)
 
 Template and checks to monitor rabbitmq queues and server via Zabbix.
