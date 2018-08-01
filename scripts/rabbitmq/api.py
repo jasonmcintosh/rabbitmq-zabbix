@@ -3,12 +3,14 @@
 results that can then be used by Zabbix.
 https://github.com/jasonmcintosh/rabbitmq-zabbix
 '''
+from __future__ import unicode_literals
+
+import io
 import json
 import optparse
 import socket
 import urllib2
 import subprocess
-import tempfile
 import os
 import logging
 
@@ -104,7 +106,7 @@ class RabbitMQAPI(object):
         if not filters:
             filters = [{}]
 
-        rdatafile = tempfile.NamedTemporaryFile(delete=False)
+        buffer = io.StringIO()
 
         try:
             for queue in self.call_api('queues'):
@@ -117,18 +119,16 @@ class RabbitMQAPI(object):
                         success = True
                         break
                 if success:
-                    self._prepare_data(queue, rdatafile)
+                    self._prepare_data(queue, buffer)
         except urllib2.HTTPError as err:
             if err.code == 404:
-                rdatafile.close()
-                os.unlink(rdatafile.name)
+                buffer.close()
                 return return_code
             else:
                 raise err
 
-        rdatafile.close()
-        return_code = self._send_data(rdatafile)
-        os.unlink(rdatafile.name)
+        return_code = self._send_data(buffer)
+        buffer.close()
         return return_code
 
     def check_shovel(self, filters=None):
@@ -137,7 +137,7 @@ class RabbitMQAPI(object):
         if not filters:
             filters = [{}]
 
-        rdatafile = tempfile.NamedTemporaryFile(delete=False)
+        buffer = io.StringIO()
 
         try:
             for shovel in self.call_api('shovels'):
@@ -154,21 +154,19 @@ class RabbitMQAPI(object):
                     key = key.format(shovel['vhost'], 'state', shovel['name'])
                     value = shovel.get('state', 0)
                     logging.debug("SENDER_DATA: - %s %s" % (key,value))
-                    rdatafile.write("- %s %s\n" % (key, value))
+                    buffer.write("- %s %s\n" % (key, value))
         except urllib2.HTTPError as err:
             if err.code == 404:
-                rdatafile.close()
-                os.unlink(rdatafile.name)
+                buffer.close()
                 return return_code
             else:
                 raise err
 
-        rdatafile.close()
-        return_code = self._send_data(rdatafile)
-        os.unlink(rdatafile.name)
+        return_code = self._send_data(buffer)
+        buffer.close()
         return return_code
 
-    def _prepare_data(self, queue, tmpfile):
+    def _prepare_data(self, queue, file):
         '''Prepare the queue data for sending'''
         for item in ['memory', 'messages', 'messages_unacknowledged',
                      'consumers']:
@@ -176,26 +174,27 @@ class RabbitMQAPI(object):
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get(item, 0)
             logging.debug("SENDER_DATA: - %s %s" % (key,value))
-            tmpfile.write("- %s %s\n" % (key, value))
+            file.write("- %s %s\n" % (key, value))
         ##  This is a non standard bit of information added after the standard items
         for item in ['deliver_get', 'publish', 'ack']:
             key = '"rabbitmq.queues[{0},queue_message_stats_{1},{2}]"'
             key = key.format(queue['vhost'], item, queue['name'])
             value = queue.get('message_stats', {}).get(item, 0)
             logging.debug("SENDER_DATA: - %s %s" % (key,value))
-            tmpfile.write("- %s %s\n" % (key, value))
-			
+            file.write("- %s %s\n" % (key, value))
 
-    def _send_data(self, tmpfile):
+    def _send_data(self, file):
         '''Send the queue data to Zabbix.'''
-        args = 'zabbix_sender -vv -c {0} -i {1}'
+        args = 'zabbix_sender -vv -c {0} -i -'
         if self.senderhostname:
             args = args + " -s " + self.senderhostname
         return_code = 0
-        process = subprocess.Popen(args.format(self.conf, tmpfile.name),
-                                           shell=True, stdout=subprocess.PIPE,
+        process = subprocess.Popen(args.format(self.conf),
+                                           shell=True,
+                                           stdin=subprocess.PIPE,
+                                           stdout=subprocess.PIPE,
                                            stderr=subprocess.PIPE)
-        out, err = process.communicate()
+        out, err = process.communicate(input=file.getvalue())
         logging.debug("Finished sending data")
         return_code = process.wait()
         logging.info("Found return code of " + str(return_code))
@@ -264,7 +263,7 @@ def main():
     logging.debug("Started trying to process data")
     api = RabbitMQAPI(user_name=options.username, password=options.password,
                       host_name=options.hostname, port=options.port,
-                      conf=options.conf, senderhostname=options.senderhostname, 
+                      conf=options.conf, senderhostname=options.senderhostname,
 		     protocol=options.protocol)
     if options.filters:
         try:
