@@ -89,7 +89,7 @@
                     <value_type>0</value_type>
                     <allowed_hosts/>
                     <units>msgs/s</units>
-                    <delta>1</delta>
+                    <delta>0</delta>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -132,7 +132,7 @@
                     <value_type>0</value_type>
                     <allowed_hosts/>
                     <units>msgs/s</units>
-                    <delta>1</delta>
+                    <delta>0</delta>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -991,7 +991,7 @@
                             <value_type>0</value_type>
                             <allowed_hosts/>
                             <units>msgs/s</units>
-                            <delta>1</delta>
+                            <delta>0</delta>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -1120,7 +1120,7 @@
                             <value_type>0</value_type>
                             <allowed_hosts/>
                             <units>msgs/s</units>
-                            <delta>1</delta>
+                            <delta>0</delta>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -1163,7 +1163,7 @@
                             <value_type>0</value_type>
                             <allowed_hosts/>
                             <units>msgs/s</units>
-                            <delta>1</delta>
+                            <delta>0</delta>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
