@@ -25,8 +25,7 @@ def test_queue_check(capsys, monkeypatch):
     monkeypatch.setattr(logging, "debug", mockdebug)
     monkeypatch.setattr(logging, "info", mockdebug)
 
-    with pytest.raises(Exception):
-        main()
+    main()
     out, err = capsys.readouterr()
     assert "Started trying to process data" in debugoutput
     assert "Issue a rabbit" in debugoutput
