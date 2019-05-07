@@ -187,7 +187,7 @@ class RabbitMQAPI(object):
         '''Send the queue data to Zabbix.'''
         args = 'zabbix_sender -vv -c {0} -i -'
         if self.senderhostname:
-            args = args + " -s " + self.senderhostname
+            args = args + " -s '%s' " % self.senderhostname
         return_code = 0
         process = subprocess.Popen(args.format(self.conf),
                                            shell=True,
