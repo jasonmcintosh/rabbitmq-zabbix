@@ -1,7 +1,7 @@
 rabbitmq-zabbix
 =======================
 
-<bold><note>Project is in ARCHIVED state.  I no longer work on zabbix nor rabbitmq, and don't have the time to maintain it.  If there are others who'd like to continue maintenance, feel free to reach out to me - ideally show it with a PR and an updated Readme ;)<bold>.  Note, for monitoring in general, I'd look at alternatives to Zabbix.  Most of what I see is SaaS or Prometheus and there are solutions for those platforms which are MUCH better supported at this point.  Sorry for the lack of updates but I have other projects I work on (Spinnaker is my main area of focus at this time, as well as DevOps automation for Cloud infrastructure)</note>
+<strong><note>Project is in ARCHIVED state.  I no longer work on zabbix nor rabbitmq, and don't have the time to maintain it.  If there are others who'd like to continue maintenance, feel free to reach out to me - ideally show it with a PR and an updated Readme ;)</strong>.  Note, for monitoring in general, I'd look at alternatives to Zabbix.  Most of what I see is SaaS or Prometheus and there are solutions for those platforms which are MUCH better supported at this point.  Sorry for the lack of updates but I have other projects I work on (Spinnaker is my main area of focus at this time, as well as DevOps automation for Cloud infrastructure)</note>
 
 [![Build Status](https://travis-ci.org/jasonmcintosh/rabbitmq-zabbix.svg?branch=master)](https://travis-ci.org/jasonmcintosh/rabbitmq-zabbix)
 
